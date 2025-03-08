@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Inventory Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        // Hot Reload WebSocket Connection
+        const connectWebSocket = () => {
+            const ws = new WebSocket('ws://localhost:8001');
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'reload') {
+                    console.log('Reloading page...');
+                    window.location.reload();
+                }
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected. Reconnecting...');
+                setTimeout(connectWebSocket, 1000);
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        };
+        
+        // Start WebSocket connection
+        connectWebSocket();
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <span class="logo-text">Smart Inventory</span>
+                </div>
+                <div class="nav-links">
+                    <div class="nav-item">
+                        <a href="#features">Features</a>
+                        <div class="dropdown-menu features-dropdown">
+                            <a href="#inventory">Inventory Management</a>
+                            <a href="#order">Order Management</a>
+                            <a href="#billing">Billing & Invoicing</a>
+                            <a href="#reporting">Reporting & Analytics</a>
+                            <a href="#ai">AI Capabilities</a>
+                        </div>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="coming-soon-link">Solutions</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="coming-soon-link">Pricing</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="#" class="coming-soon-link">Resources</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="signin.html" class="signin-nav-btn">Sign In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-inventory">
+        <div class="hero-content">
+            <div class="main-heading">
+                <h1>AI enabled inventory management system for MSME</h1>
+                <p class="subtitle">Manage orders. Track inventory. Handle GST billing. Oversee warehouses.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="hero-signup">
+        <div class="container">
+            <div class="red-container">
+                <div class="hero-content">
+                    <div class="greeting-section">
+                        <h1>Hello, Namaste, Pranam, Sasrikaal<span class="namaste-emoji">🙏</span></h1>
+                        <p class="hero-subtitle">We will be happy to have you on board.</p>
+                    </div>
+                    <div class="signup-section">
+                        <button class="signup-btn">SIGN UP FOR FREE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add after the hero-signup section and before the features section -->
+    <section class="demo-video-section">
+        <div class="container">
+            <h2 class="video-section-title">See one of the feature in Action : Demand prediction</h2>
+            <div class="video-container">
+                <video id="demoVideo" class="demo-video" poster="dashboard-thumbnail.jpg" playsinline>
+                    <source src="WhatsApp Video 2025-01-27 at 01.08.44.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="video-overlay">
+                    <button class="play-button">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="11" stroke="white" stroke-width="2"/>
+                            <path d="M9.5 7.5v9l7-4.5-7-4.5z" fill="white"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="video-progress">
+                    <div class="progress-bar">
+                        <div class="progress-filled"></div>
+                    </div>
+                    <div class="timestamp">0:00 / 0:00</div>
+                </div>
+                <div class="video-controls">
+                    <button class="skip-btn" data-skip="-10">« 10s</button>
+                    <div class="tooltip inventory-summary">Inventory Summary</div>
+                    <div class="tooltip sales-activity">Sales Activity</div>
+                    <div class="tooltip top-selling">Top Selling Items</div>
+                    <button class="skip-btn" data-skip="10">10s »</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <div class="container mx-auto px-4 py-16" id="features">
+        <h2 class="text-xl text-gray-600 font-medium mb-8 text-center">FEATURES</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            <!-- Inventory Management -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <div class="flex items-start gap-4 cursor-pointer" onclick="toggleContent('inventory-content', event)">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                        📊
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-3">Inventory Management</h2>
+                        <ul class="space-y-2 text-gray-600 text-sm">
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Centralized inventory tracking with automatic updates</li>
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">FIFO tracking system for batch management</li>
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Product catalog with detailed attributes</li>
+                        </ul>
+                        <a href="#" class="learn-more">Learn More →</a>
+                    </div>
+                </div>
+                <div id="inventory-content" class="hidden mt-4 pt-4 border-t border-gray-100">
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Inventory Management forms the core foundation of the system, offering a sophisticated centralized control center for all stock-related operations. The system maintains real-time synchronization across multiple selling channels, ensuring that inventory levels are automatically adjusted whenever a sale occurs, eliminating the risk of overselling. It implements a robust FIFO tracking mechanism that meticulously monitors each batch of products, recording their entry and exit points, manufacturing dates, and storage locations. The product catalog management system allows for granular control over item details, supporting complex product hierarchies with variants based on attributes like size, color, or material. Advanced threshold monitoring continuously analyzes stock levels, triggering automated alerts when inventory approaches critical levels, while the multi-location tracking capability provides comprehensive visibility across warehouses and stores.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Order Management -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <div class="flex items-start gap-4 cursor-pointer" onclick="toggleContent('order-content', event)">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                        📝
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-3">Order Management</h2>
+                        <ul class="space-y-2 text-gray-600 text-sm">
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Purchase order history tracking</li>
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Sales order processing and monitoring</li>
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Multi-channel order synchronization</li>
+                        </ul>
+                        <a href="#" class="learn-more">Learn More →</a>
+                    </div>
+                </div>
+                <div id="order-content" class="hidden mt-4 pt-4 border-t border-gray-100">
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Order Management streamlines the entire procurement and sales cycle through an integrated approach to order processing. The system maintains a comprehensive purchase order history that tracks every interaction with suppliers, from initial quotation to final delivery. It enables automated generation of purchase orders based on predefined rules and inventory thresholds, while simultaneously monitoring fulfillment status across multiple channels. The supplier relationship management component maintains detailed vendor profiles, performance metrics, and communication histories, facilitating better negotiation and collaboration. Real-time order status tracking provides visibility into every stage of the fulfillment process, while the multi-channel synchronization ensures consistent order processing regardless of the sales channel origin.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Billing & Invoicing -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <div class="flex items-start gap-4 cursor-pointer" onclick="toggleContent('billing-content', event)">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                        💰
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-3">Billing & Invoicing</h2>
+                        <ul class="space-y-2 text-gray-600 text-sm">
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Automated invoice generation</li>
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Vendor payment tracking</li>
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Customer payment processing</li>
+                        </ul>
+                        <a href="#" class="learn-more">Learn More →</a>
+                    </div>
+                </div>
+                <div id="billing-content" class="hidden mt-4 pt-4 border-t border-gray-100">
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Billing & Invoicing delivers a comprehensive financial management solution that automates the entire billing cycle. The system generates professional invoices automatically upon order completion, incorporating all relevant details including payment terms, tax calculations, and shipping costs. It maintains a robust payment tracking system that monitors both incoming customer payments and outgoing vendor payments, providing clear visibility into cash flow. The vendor balance monitoring feature maintains running totals of amounts owed to each supplier, while customer balance tracking helps identify credit risks and payment patterns. The automated price update system ensures that any changes in vendor price lists are immediately reflected in the system, maintaining accurate cost calculations and profit margins.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Reporting & Analytics -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <div class="flex items-start gap-4 cursor-pointer" onclick="toggleContent('reporting-content', event)">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                        📈
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-3">Reporting & Analytics</h2>
+                        <ul class="space-y-2 text-gray-600 text-sm">
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Sales trend analysis</li>
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Product performance metrics</li>
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Inventory valuation reports</li>
+                        </ul>
+                        <a href="#" class="learn-more">Learn More →</a>
+                    </div>
+                </div>
+                <div id="reporting-content" class="hidden mt-4 pt-4 border-t border-gray-100">
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Reporting & Analytics transforms raw data into actionable business intelligence through comprehensive analysis tools. The system generates detailed sales trend analyses that identify patterns across different time periods, product categories, and customer segments. Product performance metrics provide insights into which items are most profitable, which are underperforming, and which might need repricing or promotion. The vendor performance reports evaluate supplier reliability, pricing competitiveness, and delivery timeliness, while customer value analysis identifies the most valuable customers and their purchasing patterns. Advanced inventory valuation reports provide accurate financial representations of stock value, while movement analysis helps optimize storage and distribution strategies. The system also tracks key performance indicators like customer retention rates and sales targets, providing early warning of potential issues.
+                    </p>
+                </div>
+            </div>
+
+            <!-- AI Capabilities -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <div class="flex items-start gap-4 cursor-pointer" onclick="toggleContent('ai-content', event)">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                        🤖
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-lg font-semibold text-gray-900 mb-3">AI Capabilities</h2>
+                        <ul class="space-y-2 text-gray-600 text-sm">
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Demand prediction and forecasting</li>
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Dynamic pricing optimization</li>
+                            <li class="pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-600">Pattern recognition and insights</li>
+                        </ul>
+                        <a href="#" class="learn-more">Learn More →</a>
+                    </div>
+                </div>
+                <div id="ai-content" class="hidden mt-4 pt-4 border-t border-gray-100">
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        AI Capabilities represent the system's most advanced features, centered on demand prediction and dynamic pricing. The demand prediction engine employs sophisticated machine learning algorithms that analyze historical sales data, identifying seasonal patterns and market trends to forecast future demand accurately. It considers multiple variables including past sales, promotional events, competitor actions, and external factors like weather or economic indicators. The system continuously learns from new data, improving its predictive accuracy over time. The dynamic pricing component leverages real-time market data and internal metrics to optimize pricing strategies. It analyzes price elasticity across different product categories and customer segments, suggesting optimal price points that maximize both sales volume and profit margins. The system can automatically adjust prices based on inventory levels, competitor pricing, demand fluctuations, and customer segment responsiveness, ensuring that pricing remains competitive while maintaining profitability. Advanced features include bundle pricing optimization and volume discount recommendations based on customer purchasing patterns and inventory holding costs.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--primary-color);">Sign Up</h2>
+            <form class="modal-form" id="signupForm">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add the Coming Soon modal after the signup modal -->
+    <div id="comingSoonModal" class="modal">
+        <div class="modal-content coming-soon-content">
+            <span class="close-modal">&times;</span>
+            <img src="png-clipart-coming-soon-sticker-coming-soon-cartoon-sign-icons-logos-emojis-coming-soon-thumbnail.png" alt="Coming Soon" class="coming-soon-img">
+        </div>
+    </div>
+
+    <script>
+        // Scroll to top on page load
+        window.onload = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        function toggleContent(id, event) {
+            // Prevent default link behavior
+            if (event) {
+                event.preventDefault();
+            }
+
+            const content = document.getElementById(id);
+            const header = content.previousElementSibling;
+            const icon = header.querySelector('span');
+            
+            // Close all other sections and reset their icons
+            const allContents = document.querySelectorAll('[id$="-content"]');
+            const allHeaders = document.querySelectorAll('.flex.items-start.gap-4');
+            allContents.forEach((item, index) => {
+                if (item.id !== id && !item.classList.contains('hidden')) {
+                    item.classList.add('hidden');
+                    const itemIcon = allHeaders[index].querySelector('span');
+                    if (itemIcon) {
+                        itemIcon.textContent = '+';
+                        itemIcon.classList.remove('rotate-180');
+                    }
+                }
+            });
+
+            // Toggle the clicked section
+            content.classList.toggle('hidden');
+            
+            // Update icon if it exists
+            if (icon) {
+                if (content.classList.contains('hidden')) {
+                    icon.textContent = '+';
+                    icon.classList.remove('rotate-180');
+                } else {
+                    icon.textContent = '−';
+                    icon.classList.add('rotate-180');
+                }
+            }
+
+            // If content is now visible, scroll to features section
+            if (!content.classList.contains('hidden')) {
+                setTimeout(() => {
+                    const featuresSection = document.getElementById('features');
+                    featuresSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        }
+
+        // Add click handlers for dropdown menu items
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdownLinks = document.querySelectorAll('.features-dropdown a');
+            dropdownLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1) + '-content';
+                    const targetElement = document.getElementById(targetId);
+                    if (targetElement) {
+                        // Close all sections first
+                        const allContents = document.querySelectorAll('[id$="-content"]');
+                        const allHeaders = document.querySelectorAll('.flex.items-start.gap-4');
+                        allContents.forEach((content, index) => {
+                            content.classList.add('hidden');
+                            const itemIcon = allHeaders[index].querySelector('span');
+                            if (itemIcon) {
+                                itemIcon.textContent = '+';
+                                itemIcon.classList.remove('rotate-180');
+                            }
+                        });
+                        
+                        // Show target section and update its icon
+                        targetElement.classList.remove('hidden');
+                        const header = targetElement.previousElementSibling;
+                        const icon = header.querySelector('span');
+                        if (icon) {
+                            icon.textContent = '−';
+                            icon.classList.add('rotate-180');
+                        }
+                        
+                        // Scroll to features section
+                        setTimeout(() => {
+                            const featuresSection = document.getElementById('features');
+                            featuresSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                    }
+                });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('signupModal');
+            const signupBtn = document.querySelector('.signup-btn');
+            const closeBtn = document.querySelector('.close-modal');
+            const form = document.getElementById('signupForm');
+
+            signupBtn.addEventListener('click', function() {
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            });
+
+            closeBtn.addEventListener('click', function() {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Handle form submission here
+                console.log('Form submitted:', {
+                    name: form.name.value,
+                    phone: form.phone.value,
+                    email: form.email.value
+                });
+                // You can add your form submission logic here
+                
+                // Close the modal after submission
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                form.reset();
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const comingSoonModal = document.getElementById('comingSoonModal');
+            const comingSoonLinks = document.querySelectorAll('.coming-soon-link');
+            const closeButtons = document.querySelectorAll('.close-modal');
+
+            comingSoonLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    comingSoonModal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    comingSoonModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                });
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target === comingSoonModal) {
+                    comingSoonModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('demoVideo');
+            const playButton = document.querySelector('.play-button');
+            const videoOverlay = document.querySelector('.video-overlay');
+            const videoContainer = document.querySelector('.video-container');
+            const progressBar = document.querySelector('.progress-bar');
+            const progress = document.querySelector('.progress-filled');
+            const timestamp = document.querySelector('.timestamp');
+            const skipButtons = document.querySelectorAll('.skip-btn');
+
+            // Format time in minutes and seconds
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                seconds = Math.floor(seconds % 60);
+                return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+
+            // Update progress bar and timestamp
+            function handleProgress() {
+                const percent = (video.currentTime / video.duration) * 100;
+                progress.style.width = `${percent}%`;
+                timestamp.textContent = `${formatTime(video.currentTime)} / ${formatTime(video.duration)}`;
+            }
+
+            // Skip video forward or backward
+            skipButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const skipTime = parseFloat(this.dataset.skip);
+                    video.currentTime += skipTime;
+                });
+            });
+
+            // Click on progress bar to seek
+            progressBar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const scrubTime = (e.offsetX / progressBar.offsetWidth) * video.duration;
+                video.currentTime = scrubTime;
+            });
+
+            // Update progress bar as video plays
+            video.addEventListener('timeupdate', handleProgress);
+
+            // Update timestamp when metadata is loaded
+            video.addEventListener('loadedmetadata', function() {
+                timestamp.textContent = `0:00 / ${formatTime(video.duration)}`;
+            });
+
+            // Function to toggle play/pause
+            function toggleVideo() {
+                if (video.paused) {
+                    video.play();
+                    videoOverlay.style.opacity = '0';
+                } else {
+                    video.pause();
+                    videoOverlay.style.opacity = '1';
+                }
+            }
+
+            // Handle play/pause on video container click
+            videoContainer.addEventListener('click', function(e) {
+                // Prevent click from triggering multiple times
+                e.stopPropagation();
+                toggleVideo();
+            });
+
+            // Handle play/pause on play button click
+            playButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleVideo();
+            });
+
+            // Show overlay when video ends
+            video.addEventListener('ended', function() {
+                videoOverlay.style.opacity = '1';
+            });
+
+            // Show overlay when video is paused
+            video.addEventListener('pause', function() {
+                videoOverlay.style.opacity = '1';
+            });
+
+            // Hide overlay when video is playing
+            video.addEventListener('play', function() {
+                videoOverlay.style.opacity = '0';
+            });
+
+            // Handle tooltips
+            const tooltips = document.querySelectorAll('.tooltip');
+            tooltips.forEach(tooltip => {
+                tooltip.addEventListener('click', function(e) {
+                    // Prevent the video from toggling when clicking tooltips
+                    e.stopPropagation();
+                    const timestamp = this.dataset.timestamp;
+                    if (timestamp) {
+                        video.currentTime = parseFloat(timestamp);
+                        if (video.paused) {
+                            video.play();
+                            videoOverlay.style.opacity = '0';
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

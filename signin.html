@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - Smart Inventory Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <a href="index.html" class="logo-text">Smart Inventory</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="signin-container">
+        <div class="signin-box">
+            <h2 class="signin-title">Sign In</h2>
+            <form id="signinForm" class="signin-form" onsubmit="handleSignIn(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="signin-btn">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function handleSignIn(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Here you can add the actual authentication logic
+            // For now, we'll just redirect to the dashboard
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Week Stock Products - Smart Inventory Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <span class="logo-text">Smart Inventory</span>
+                </div>
+                <div class="nav-links">
+                    <div class="nav-item">
+                        <a href="dashboard.html">Home</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="products.html">Products</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="sales.html">Sales</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="inventory.html">Inventory</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="invoices.html">Invoices</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="index.html" class="signout-btn">Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="dashboard-title">Products with One Week Stock</h1>
+                <a href="dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                </a>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>MRP</th>
+                            <th>Predicted Price</th>
+                            <th>Stock</th>
+                            <th>Quantity Prediction</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Product F</td>
+                            <td>₹850</td>
+                            <td>₹820</td>
+                            <td>25</td>
+                            <td>75</td>
+                            <td>
+                                <a href="vendors.html?product=Product%20F" class="action-btn">Contact Vendors</a>
+                                <a href="inventory.html?product=Product%20F" class="action-btn">Analysis</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Product B</td>
+                            <td>₹2500</td>
+                            <td>₹2400</td>
+                            <td>75</td>
+                            <td>100</td>
+                            <td>
+                                <a href="vendors.html?product=Product%20B" class="action-btn">Contact Vendors</a>
+                                <a href="inventory.html?product=Product%20B" class="action-btn">Analysis</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

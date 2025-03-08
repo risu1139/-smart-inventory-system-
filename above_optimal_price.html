@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Above Optimal Price Products - Smart Inventory Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <span class="logo-text">Smart Inventory</span>
+                </div>
+                <div class="nav-links">
+                    <div class="nav-item">
+                        <a href="dashboard.html">Home</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="products.html">Products</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="sales.html">Sales</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="inventory.html">Inventory</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="invoices.html">Invoices</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="index.html" class="signout-btn">Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="dashboard-title">Products Above Optimal Price</h1>
+                <a href="dashboard.html" class="back-btn">
+                    <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                </a>
+            </div>
+            
+            <div class="info-banner bg-orange-100 border-l-4 border-orange-500 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-orange-500"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-orange-700">
+                            These products are currently priced above their optimal price point based on market analysis. Consider price adjustments to improve sales velocity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Current MRP</th>
+                            <th>Predicted Price</th>
+                            <th>Price Difference</th>
+                            <th>Stock</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Product N</td>
+                            <td>₹1800</td>
+                            <td>₹1650</td>
+                            <td><span class="text-orange-500">+₹150 (9.1%)</span></td>
+                            <td>220</td>
+                            <td>
+                                <a href="vendors.html?product=Product%20N" class="action-btn">Contact Vendors</a>
+                                <a href="inventory.html?product=Product%20N" class="action-btn">Analysis</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Product O</td>
+                            <td>₹3500</td>
+                            <td>₹3200</td>
+                            <td><span class="text-orange-500">+₹300 (9.4%)</span></td>
+                            <td>85</td>
+                            <td>
+                                <a href="vendors.html?product=Product%20O" class="action-btn">Contact Vendors</a>
+                                <a href="inventory.html?product=Product%20O" class="action-btn">Analysis</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Product P</td>
+                            <td>₹750</td>
+                            <td>₹650</td>
+                            <td><span class="text-orange-500">+₹100 (15.4%)</span></td>
+                            <td>175</td>
+                            <td>
+                                <a href="vendors.html?product=Product%20P" class="action-btn">Contact Vendors</a>
+                                <a href="inventory.html?product=Product%20P" class="action-btn">Analysis</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="recommendations mt-8 p-6 bg-white rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Pricing Recommendations</h2>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li>Consider strategic discounts or promotions to increase sales velocity.</li>
+                    <li>Analyze sales data to identify price elasticity for each product.</li>
+                    <li>Implement limited-time offers to test optimal price points.</li>
+                    <li>Review competitor pricing to ensure market competitiveness.</li>
+                    <li>Consider bundling with complementary products to maintain revenue while adjusting prices.</li>
+                </ul>
+            </div>
+            
+            <div class="sales-velocity-chart mt-8 p-6 bg-white rounded-lg shadow">
+                <h2 class="text-xl font-semibold mb-4">Sales Velocity Impact</h2>
+                <div class="chart-container" style="height: 300px;">
+                    <canvas id="salesVelocityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sales Velocity Impact Chart
+            const ctx = document.getElementById('salesVelocityChart').getContext('2d');
+            const salesVelocityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Current Price', '-5%', '-10%', '-15%', '-20%'],
+                    datasets: [
+                        {
+                            label: 'Projected Sales Volume',
+                            data: [100, 115, 135, 160, 190],
+                            borderColor: '#f97316',
+                            backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Projected Revenue',
+                            data: [100, 109, 121, 136, 152],
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw + '% of current';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 90,
+                            title: {
+                                display: true,
+                                text: 'Percentage of Current (100%)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

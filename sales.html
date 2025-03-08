@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales - Smart Inventory Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .save-print-btn {
+            background-color: #22c55e;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-left: 1rem;
+        }
+        
+        .save-print-btn:hover {
+            background-color: #16a34a;
+            transform: translateY(-2px);
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 2rem;
+        }
+        
+        @media print {
+            .navbar, .search-box, .form-actions, .add-to-list-btn {
+                display: none !important;
+            }
+            
+            body {
+                font-size: 12pt;
+                color: #000;
+                background-color: #fff;
+            }
+            
+            .dashboard-container {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .print-header {
+                display: block !important;
+                margin-bottom: 2rem;
+            }
+            
+            .items-table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            
+            .items-table th, .items-table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+            }
+        }
+        
+        .print-header {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <span class="logo-text">Smart Inventory</span>
+                </div>
+                <div class="nav-links">
+                    <div class="nav-item">
+                        <a href="dashboard.html">Home</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="products.html">Products</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="sales.html" class="active">Sales</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="inventory.html">Inventory</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="invoices.html">Invoices</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="index.html" class="signout-btn">Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <div class="sales-form-container">
+                <h1 class="page-title">Sales Transaction</h1>
+                
+                <!-- Print Header - Only visible when printing -->
+                <div class="print-header">
+                    <h1 style="font-size: 24pt; font-weight: bold; text-align: center; margin-bottom: 20px;">Smart Inventory Management System</h1>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <div>
+                            <p><strong>Invoice Date:</strong> <span id="printDate"></span></p>
+                            <p><strong>Customer:</strong> <span id="printCustomer"></span></p>
+                        </div>
+                        <div>
+                            <p><strong>Invoice #:</strong> INV-<span id="printInvoiceNumber"></span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <form id="salesForm" class="sales-form">
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="customerName">Customer Name</label>
+                            <input type="text" id="customerName" name="customerName" required class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2 class="section-title">Items</h2>
+                        <div class="items-section">
+                            <div class="product-selection">
+                                <div class="form-group product-select-group">
+                                    <label for="productSelect">Product</label>
+                                    <div class="select-with-button">
+                                        <select id="productSelect" name="product" class="form-select">
+                                            <option value="" disabled selected>Please Select Product here</option>
+                                            <option value="product1">Laptop Pro X</option>
+                                            <option value="product2">Wireless Mouse</option>
+                                            <option value="product3">External SSD</option>
+                                        </select>
+                                        <button type="button" id="addToList" class="add-to-list-btn">
+                                            <i class="fas fa-plus"></i> ADD TO LIST
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="items-table-container">
+                                <table class="items-table">
+                                    <thead>
+                                        <tr>
+                                            <th>QTY</th>
+                                            <th>Product</th>
+                                            <th>Price</th>
+                                            <th>Total</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="itemsList">
+                                        <!-- Items will be added here dynamically -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="text-right"><strong>Total</strong></td>
+                                            <td class="total-amount">₹0.00</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="save-btn">
+                            <i class="fas fa-save"></i> SAVE
+                        </button>
+                        <button type="button" id="saveAndPrintBtn" class="save-print-btn">
+                            <i class="fas fa-print"></i> SAVE & PRINT
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quantity Modal -->
+    <div id="quantityModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">Enter Quantity</h2>
+            <form id="quantityForm" class="modal-form">
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" name="quantity" min="1" required>
+                </div>
+                <button type="submit" class="submit-btn">Add Item</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="sales.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Existing script code from sales.js...
+            
+            // Add Save and Print functionality
+            const saveAndPrintBtn = document.getElementById('saveAndPrintBtn');
+            saveAndPrintBtn.addEventListener('click', function() {
+                // Validate form
+                const customerName = document.getElementById('customerName').value;
+                const itemsList = document.getElementById('itemsList');
+                
+                if (!customerName) {
+                    alert('Please enter customer name');
+                    return;
+                }
+                
+                if (itemsList.children.length === 0) {
+                    alert('Please add at least one item');
+                    return;
+                }
+                
+                // Set print values
+                document.getElementById('printCustomer').textContent = customerName;
+                document.getElementById('printDate').textContent = new Date().toLocaleDateString();
+                document.getElementById('printInvoiceNumber').textContent = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+                
+                // Print the page
+                window.print();
+                
+                // Submit the form programmatically (simulating save)
+                setTimeout(() => {
+                    alert('Sale saved successfully!');
+                    // You would normally submit the form here or call your save API
+                    // document.getElementById('salesForm').submit();
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html> 

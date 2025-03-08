@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart Inventory Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Removed stock-good and stock-low styles as requested */
+        .action-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        .action-btn:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            width: calc(50% - 1rem);
+        }
+        .graph-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .graph-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            width: calc(50% - 1rem);
+        }
+        .search-sort-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+        .sort-container select {
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background-color: white;
+        }
+        @media (max-width: 768px) {
+            .chart-card, .graph-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <span class="logo-text">Smart Inventory</span>
+                </div>
+                <div class="nav-links">
+                    <div class="nav-item">
+                        <a href="dashboard.html" class="active">Home</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="products.html">Products</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="sales.html">Sales</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="inventory.html">Inventory</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="invoices.html">Invoices</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="index.html" class="signout-btn">Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <h1 class="dashboard-title">Product Overview</h1>
+            
+            <!-- Added search and sort functionality -->
+            <div class="search-sort-container">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="productSearch" placeholder="Search products..." class="search-input">
+                </div>
+                <div class="sort-container">
+                    <select id="productSort">
+                        <option value="default">Default Order</option>
+                        <option value="nameAsc">Name (A-Z)</option>
+                        <option value="nameDesc">Name (Z-A)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="productsTable">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>MRP</th>
+                            <th>Predicted Price</th>
+                            <th>Stock</th>
+                            <th>Quantity Prediction</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Removed stock-low and stock-good classes as requested -->
+                        <tr>
+                            <td>Product A</td>
+                            <td>₹1000</td>
+                            <td>₹950</td>
+                            <td>150</td>
+                            <td>200</td>
+                            <td>
+                                <a href="vendors.html?product=Product%20A" class="action-btn">Contact Vendors</a>
+                                <a href="inventory.html?product=Product%20A" class="action-btn">Analysis</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Product B</td>
+                            <td>₹2500</td>
+                            <td>₹2400</td>
+                            <td>75</td>
+                            <td>100</td>
+                            <td>
+                                <a href="vendors.html?product=Product%20B" class="action-btn">Contact Vendors</a>
+                                <a href="inventory.html?product=Product%20B" class="action-btn">Analysis</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Product C</td>
+                            <td>₹500</td>
+                            <td>₹480</td>
+                            <td>300</td>
+                            <td>250</td>
+                            <td>
+                                <a href="vendors.html?product=Product%20C" class="action-btn">Contact Vendors</a>
+                                <a href="inventory.html?product=Product%20C" class="action-btn">Analysis</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Added charts section -->
+            <div class="chart-container">
+                <div class="chart-card">
+                    <h2 class="text-xl font-semibold mb-4">Stock Status</h2>
+                    <canvas id="stockChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h2 class="text-xl font-semibold mb-4">Pricing Analysis</h2>
+                    <canvas id="pricingChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Added graphs section -->
+            <div class="graph-container">
+                <div class="graph-card">
+                    <h2 class="text-xl font-semibold mb-4">Daily Retail Price Changes</h2>
+                    <canvas id="priceGraph"></canvas>
+                </div>
+                <div class="graph-card">
+                    <h2 class="text-xl font-semibold mb-4">Daily Profit Changes</h2>
+                    <canvas id="profitGraph"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search functionality
+            const searchInput = document.getElementById('productSearch');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const tableRows = document.querySelectorAll('#productsTable tbody tr');
+                
+                tableRows.forEach(row => {
+                    const productName = row.querySelector('td:first-child').textContent.toLowerCase();
+                    if (productName.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Sorting functionality
+            const sortSelect = document.getElementById('productSort');
+            sortSelect.addEventListener('change', function() {
+                const sortValue = this.value;
+                const tableBody = document.querySelector('#productsTable tbody');
+                const rows = Array.from(tableBody.querySelectorAll('tr'));
+                
+                if (sortValue === 'nameAsc') {
+                    rows.sort((a, b) => {
+                        const aName = a.querySelector('td:first-child').textContent;
+                        const bName = b.querySelector('td:first-child').textContent;
+                        return aName.localeCompare(bName);
+                    });
+                } else if (sortValue === 'nameDesc') {
+                    rows.sort((a, b) => {
+                        const aName = a.querySelector('td:first-child').textContent;
+                        const bName = b.querySelector('td:first-child').textContent;
+                        return bName.localeCompare(aName);
+                    });
+                } else {
+                    // Default sorting (by original order)
+                    rows.sort((a, b) => {
+                        return Array.from(tableBody.querySelectorAll('tr')).indexOf(a) - 
+                               Array.from(tableBody.querySelectorAll('tr')).indexOf(b);
+                    });
+                }
+                
+                // Clear and re-append sorted rows
+                while (tableBody.firstChild) {
+                    tableBody.removeChild(tableBody.firstChild);
+                }
+                
+                rows.forEach(row => tableBody.appendChild(row));
+            });
+            
+            // Stock Status Pie Chart
+            const stockCtx = document.getElementById('stockChart').getContext('2d');
+            const stockChart = new Chart(stockCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Out of Stock', 'One Week Stock', 'Two Weeks Stock', 'More than Two Weeks'],
+                    datasets: [{
+                        data: [5, 10, 15, 20],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f97316',
+                            '#facc15',
+                            '#22c55e'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + ' products';
+                                }
+                            }
+                        }
+                    },
+                    onClick: function(e, elements) {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const urls = [
+                                'out_of_stock.html',
+                                'one_week_stock.html',
+                                'two_week_stock.html',
+                                'more_than_two_weeks_stock.html'
+                            ];
+                            window.location.href = urls[index];
+                        }
+                    }
+                }
+            });
+            
+            // Pricing Analysis Pie Chart
+            const pricingCtx = document.getElementById('pricingChart').getContext('2d');
+            const pricingChart = new Chart(pricingCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Optimal Price', 'Below Optimal', 'Above Optimal'],
+                    datasets: [{
+                        data: [20, 10, 15],
+                        backgroundColor: [
+                            '#22c55e',
+                            '#3b82f6',
+                            '#f97316'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + ' products';
+                                }
+                            }
+                        }
+                    },
+                    onClick: function(e, elements) {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const urls = [
+                                'optimal_price.html',
+                                'below_optimal_price.html',
+                                'above_optimal_price.html'
+                            ];
+                            window.location.href = urls[index];
+                        }
+                    }
+                }
+            });
+            
+            // Daily Retail Price Changes Line Graph
+            const priceCtx = document.getElementById('priceGraph').getContext('2d');
+            const priceGraph = new Chart(priceCtx, {
+                type: 'line',
+                data: {
+                    labels: [...Array(30).keys()].map(day => `Day ${day+1}`),
+                    datasets: [{
+                        label: 'Average Retail Price',
+                        data: Array.from({length: 30}, () => Math.floor(Math.random() * 1000) + 500),
+                        borderColor: '#3b82f6',
+                        tension: 0.2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Price (₹)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Days'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Daily Profit Changes Line Graph
+            const profitCtx = document.getElementById('profitGraph').getContext('2d');
+            const profitGraph = new Chart(profitCtx, {
+                type: 'line',
+                data: {
+                    labels: [...Array(30).keys()].map(day => `Day ${day+1}`),
+                    datasets: [{
+                        label: 'Daily Profit',
+                        data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 1000),
+                        borderColor: '#22c55e',
+                        tension: 0.2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Profit (₹)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Days'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

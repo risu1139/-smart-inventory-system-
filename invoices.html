@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoices - Smart Inventory Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .invoice-details {
+            display: none;
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .invoice-details.show {
+            display: block;
+        }
+
+        .print-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .print-btn:hover {
+            background-color: #45a049;
+        }
+
+        .invoice-header {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .invoice-items {
+            margin: 20px 0;
+        }
+
+        .invoice-total {
+            border-top: 2px solid #dee2e6;
+            padding-top: 15px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .invoice-details.show, .invoice-details.show * {
+                visibility: visible;
+            }
+            .invoice-details.show {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .print-btn {
+                display: none;
+            }
+            .navbar, .search-box {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <span class="logo-text">Smart Inventory</span>
+                </div>
+                <div class="nav-links">
+                    <div class="nav-item">
+                        <a href="dashboard.html">Home</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="products.html">Products</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="sales.html">Sales</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="inventory.html">Inventory</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="invoices.html" class="active">Invoices</a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="index.html" class="signout-btn">Sign Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <div class="header-section">
+                <h1 class="page-title">Invoices</h1>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search invoices..." class="search-input">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-controls">
+                <div class="entries-selector">
+                    <label>Show entries:</label>
+                    <select id="entriesSelect" class="entries-dropdown">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table" id="invoicesTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th class="sortable" data-sort="datetime">Date/Time <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="transactionCode">Transaction Code <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="customer">Customer <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="totalItems">Total Items <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="totalAmount">Total Amount <i class="fas fa-sort"></i></th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Sample data from the image -->
+                        <tr data-invoice-id="1">
+                            <td>1</td>
+                            <td>2022-03-21 05:18 PM</td>
+                            <td>20220321003</td>
+                            <td>Claire Blake</td>
+                            <td>11</td>
+                            <td>₹1,592.47</td>
+                            <td class="action-buttons">
+                                <button class="view-invoice text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="delete-btn"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr data-invoice-id="2">
+                            <td>2</td>
+                            <td>2022-03-21 05:23 PM</td>
+                            <td>20220321001</td>
+                            <td>Samantha</td>
+                            <td>13</td>
+                            <td>₹2,241.67</td>
+                            <td class="action-buttons">
+                                <button class="view-invoice text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="delete-btn"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr data-invoice-id="3">
+                            <td>3</td>
+                            <td>2022-03-21 05:36 PM</td>
+                            <td>20220321002</td>
+                            <td>John Smith</td>
+                            <td>7</td>
+                            <td>₹1,068.25</td>
+                            <td class="action-buttons">
+                                <button class="view-invoice text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="delete-btn"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr data-invoice-id="4">
+                            <td>4</td>
+                            <td>2022-03-22 08:34 AM</td>
+                            <td>20220322001</td>
+                            <td>Mark Cooper</td>
+                            <td>25</td>
+                            <td>₹3,355.75</td>
+                            <td class="action-buttons">
+                                <button class="view-invoice text-blue-600 hover:text-blue-800">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="delete-btn"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-controls">
+                <button class="pagination-btn" id="prevPage" disabled>
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <div class="page-numbers">
+                    <span class="current-page">1</span> of <span class="total-pages">5</span>
+                </div>
+                <button class="pagination-btn" id="nextPage">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Invoice Details Template -->
+            <div class="invoice-details" id="invoiceDetails">
+                <div class="d-flex justify-content-between mb-3">
+                    <h3>Invoice Details</h3>
+                    <div>
+                        <button class="print-btn" onclick="printInvoice()">
+                            <i class="fas fa-print"></i> Print Invoice
+                        </button>
+                        <button class="btn btn-secondary" onclick="closeInvoiceDetails()">Close</button>
+                    </div>
+                </div>
+                <div class="invoice-header">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Smart Inventory</h4>
+                            <p>123 Business Street</p>
+                            <p>City, State, ZIP</p>
+                            <p>Phone: (123) 456-7890</p>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <h5>Invoice #: <span id="invoiceNumber"></span></h5>
+                            <p>Date: <span id="invoiceDate"></span></p>
+                            <p>Customer: <span id="customerName"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="invoice-items">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceItemsList">
+                            <!-- Items will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="invoice-total text-right">
+                    <p>Subtotal: ₹<span id="subtotal"></span></p>
+                    <p>Tax (18%): ₹<span id="tax"></span></p>
+                    <p>Total: ₹<span id="total"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">Delete Invoice</h2>
+            <p id="deleteMessage">Are you sure you want to delete this invoice?</p>
+            <div class="modal-actions">
+                <button id="confirmDelete" class="delete-confirm-btn">Delete</button>
+                <button id="cancelDelete" class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="invoices.js"></script>
+    <script>
+        // Hot Reload WebSocket Connection
+        const connectWebSocket = () => {
+            const ws = new WebSocket('ws://localhost:8001');
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'reload') {
+                    console.log('Reloading page...');
+                    window.location.reload();
+                }
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected. Reconnecting...');
+                setTimeout(connectWebSocket, 1000);
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+        };
+        
+        // Start WebSocket connection
+        connectWebSocket();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click event listeners to view buttons
+            const viewButtons = document.querySelectorAll('.view-invoice');
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const invoiceId = row.dataset.invoiceId;
+                    showInvoiceDetails(invoiceId);
+                });
+            });
+        });
+
+        function showInvoiceDetails(invoiceId) {
+            // Fetch invoice details from database
+            fetchInvoiceDetails(invoiceId).then(data => {
+                // Populate invoice details
+                document.getElementById('invoiceNumber').textContent = data.transactionCode;
+                document.getElementById('invoiceDate').textContent = data.datetime;
+                document.getElementById('customerName').textContent = data.customer;
+
+                // Clear and populate items
+                const itemsList = document.getElementById('invoiceItemsList');
+                itemsList.innerHTML = '';
+                data.items.forEach(item => {
+                    itemsList.innerHTML += `
+                        <tr>
+                            <td>${item.name}</td>
+                            <td>${item.quantity}</td>
+                            <td>₹${item.unitPrice.toFixed(2)}</td>
+                            <td>₹${(item.quantity * item.unitPrice).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+
+                // Calculate and display totals
+                const subtotal = data.items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+                const tax = subtotal * 0.18;
+                const total = subtotal + tax;
+
+                document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+                document.getElementById('tax').textContent = tax.toFixed(2);
+                document.getElementById('total').textContent = total.toFixed(2);
+
+                // Show invoice details
+                document.getElementById('invoiceDetails').classList.add('show');
+            });
+        }
+
+        function closeInvoiceDetails() {
+            document.getElementById('invoiceDetails').classList.remove('show');
+        }
+
+        function printInvoice() {
+            window.print();
+        }
+
+        async function fetchInvoiceDetails(invoiceId) {
+            // This function would normally fetch data from your backend
+            // For now, returning mock data
+            return {
+                transactionCode: '2022032103',
+                datetime: '2022-03-21 05:18 PM',
+                customer: 'Claire Blake',
+                items: [
+                    { name: 'Product 1', quantity: 2, unitPrice: 299.99 },
+                    { name: 'Product 2', quantity: 1, unitPrice: 499.99 },
+                    { name: 'Product 3', quantity: 3, unitPrice: 164.50 }
+                ]
+            };
+        }
+    </script>
+</body>
+</html> 
