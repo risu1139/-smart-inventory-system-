@@ -91,23 +91,67 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event Handlers
     function handleViewProduct(productData) {
-        state.selectedProduct = productData;
-        state.stockHistory = sampleStockHistory;
-        
-        // Update product details
-        document.getElementById('productCode').textContent = productData.code;
-        document.getElementById('productName').textContent = productData.name;
-        document.getElementById('productDescription').textContent = productData.description;
-        document.getElementById('productPrice').textContent = productData.price;
+        // First, fetch the complete product data from the API
+        fetch(`/api/products/${productData.id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch product details');
+                }
+                return response.json();
+            })
+            .then(product => {
+                // Store complete product data in state
+                state.selectedProduct = product;
+                
+                // Update product details in the UI
+                document.getElementById('productCode').textContent = product.id || productData.code;
+                document.getElementById('productName').textContent = product.name;
+                document.getElementById('productDescription').textContent = product.description || productData.description;
+                document.getElementById('productPrice').textContent = product.price || productData.price;
+                document.getElementById('productStock').textContent = product.current_stock || '0';
 
-        // Show product details section
-        productDetails.classList.remove('hidden');
-        
-        // Update stock history table
-        updateHistoryTable();
-        
-        // Scroll to product details
-        productDetails.scrollIntoView({ behavior: 'smooth' });
+                // Fetch stock history for this product
+                return fetch(`/api/products/${product.id}/stock-history`).catch(() => {
+                    // If the endpoint doesn't exist or fails, use sample data
+                    console.log('Using sample stock history data');
+                    return { json: () => Promise.resolve(sampleStockHistory) };
+                });
+            })
+            .then(response => response.json())
+            .then(stockHistory => {
+                // Store stock history in state
+                state.stockHistory = stockHistory || sampleStockHistory;
+                
+                // Show product details section
+                productDetails.classList.remove('hidden');
+                
+                // Update stock history table
+                updateHistoryTable();
+                
+                // Scroll to product details
+                productDetails.scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(error => {
+                console.error('Error fetching product details:', error);
+                
+                // Fallback to using the provided data
+                state.selectedProduct = productData;
+                state.stockHistory = sampleStockHistory;
+                
+                document.getElementById('productCode').textContent = productData.code;
+                document.getElementById('productName').textContent = productData.name;
+                document.getElementById('productDescription').textContent = productData.description;
+                document.getElementById('productPrice').textContent = productData.price;
+                
+                // Show product details section
+                productDetails.classList.remove('hidden');
+                
+                // Update stock history table
+                updateHistoryTable();
+                
+                // Scroll to product details
+                productDetails.scrollIntoView({ behavior: 'smooth' });
+            });
     }
 
     function updateHistoryTable() {
@@ -202,26 +246,81 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Add new stock entry
-        const newEntry = {
-            id: state.stockHistory.length + 1,
-            datetime: new Date().toLocaleString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
+        // Make API call to add stock
+        fetch('/api/add-stock', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: state.selectedProduct.id,
+                quantity: quantity,
+                reason: 'Restocking',
             }),
-            quantity: quantity,
-            type: 'Stock In',
-            canEdit: true
-        };
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to add stock');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Show success notification
+            const notification = document.createElement('div');
+            notification.className = 'notification success';
+            notification.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <p>${data.message}</p>
+                <button class="close-notification"><i class="fas fa-times"></i></button>
+            `;
+            document.body.appendChild(notification);
+            
+            // Add click event to close button
+            notification.querySelector('.close-notification').addEventListener('click', function() {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            });
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    notification.classList.add('fade-out');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 500);
+                }
+            }, 5000);
 
-        state.stockHistory.unshift(newEntry);
-        updateHistoryTable();
-        closeModals();
-        addStockForm.reset();
+            // Add new stock entry to the UI
+            const newEntry = {
+                id: data.stock_history_id,
+                datetime: new Date().toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                }),
+                quantity: quantity,
+                type: 'Stock In',
+                canEdit: true
+            };
+
+            // Update product stock in UI
+            document.getElementById('productStock').textContent = data.product.current_stock;
+
+            state.stockHistory.unshift(newEntry);
+            updateHistoryTable();
+            closeModals();
+            addStockForm.reset();
+        })
+        .catch(error => {
+            console.error('Error adding stock:', error);
+            alert('Failed to add stock. Please try again.');
+        });
     }
 
     function attachHistoryActionListeners() {
@@ -229,8 +328,89 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.onclick = function(e) {
                 e.stopPropagation();
                 const row = this.closest('tr');
-                // Implement edit functionality
-                console.log('Edit entry:', row.cells[0].textContent);
+                // Get the index in the table
+                const displayIndex = parseInt(row.cells[0].textContent) - 1;
+                // Get the actual data index in our filtered and paginated data
+                const start = (state.currentPage - 1) * state.entriesPerPage;
+                const dataIndex = start + displayIndex;
+                
+                // Get the entry from stockHistory data
+                const filteredData = filterHistoryData(searchInput.value);
+                const entry = filteredData[dataIndex];
+                
+                if (!entry) {
+                    console.error('Could not find entry to edit');
+                    return;
+                }
+                
+                // Open an edit modal or prompt for new quantity
+                const newQuantity = prompt(`Enter new quantity for entry #${entry.id}:`, entry.quantity);
+                if (newQuantity === null) return; // User cancelled
+                
+                const quantity = parseInt(newQuantity);
+                if (isNaN(quantity) || quantity < 1) {
+                    alert('Please enter a valid quantity (greater than 0)');
+                    return;
+                }
+                
+                // Call the API to update the entry
+                fetch(`/api/stock-history/${entry.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        quantity: quantity
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to update stock history');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Show success notification
+                    const notification = document.createElement('div');
+                    notification.className = 'notification success';
+                    notification.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        <p>${data.message}</p>
+                        <button class="close-notification"><i class="fas fa-times"></i></button>
+                    `;
+                    document.body.appendChild(notification);
+                    
+                    // Add click event to close button
+                    notification.querySelector('.close-notification').addEventListener('click', function() {
+                        notification.classList.add('fade-out');
+                        setTimeout(() => {
+                            notification.remove();
+                        }, 500);
+                    });
+                    
+                    // Auto remove after 5 seconds
+                    setTimeout(() => {
+                        if (document.body.contains(notification)) {
+                            notification.classList.add('fade-out');
+                            setTimeout(() => {
+                                notification.remove();
+                            }, 500);
+                        }
+                    }, 5000);
+                    
+                    // Update the entry in the UI
+                    entry.quantity = quantity;
+                    
+                    // Update the product stock in the UI
+                    document.getElementById('productStock').textContent = data.product.current_stock;
+                    
+                    // Refresh the table
+                    updateHistoryTable();
+                })
+                .catch(error => {
+                    console.error('Error updating stock history:', error);
+                    alert('Failed to update stock history. Please try again.');
+                });
             };
         });
 
@@ -238,10 +418,74 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.onclick = function(e) {
                 e.stopPropagation();
                 const row = this.closest('tr');
-                const index = parseInt(row.cells[0].textContent) - 1;
-                if (confirm('Are you sure you want to delete this entry?')) {
-                    state.stockHistory.splice(index, 1);
-                    updateHistoryTable();
+                // Get the index in the table
+                const displayIndex = parseInt(row.cells[0].textContent) - 1;
+                // Get the actual data index in our filtered and paginated data
+                const start = (state.currentPage - 1) * state.entriesPerPage;
+                const dataIndex = start + displayIndex;
+                
+                // Get the entry from stockHistory data
+                const filteredData = filterHistoryData(searchInput.value);
+                const entry = filteredData[dataIndex];
+                
+                if (!entry) {
+                    console.error('Could not find entry to delete');
+                    return;
+                }
+                
+                if (confirm(`Are you sure you want to delete entry #${entry.id}? This will reduce the product stock by ${entry.quantity} units.`)) {
+                    // Call the API to delete the entry
+                    fetch(`/api/stock-history/${entry.id}`, {
+                        method: 'DELETE',
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to delete stock history');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Show success notification
+                        const notification = document.createElement('div');
+                        notification.className = 'notification success';
+                        notification.innerHTML = `
+                            <i class="fas fa-check-circle"></i>
+                            <p>${data.message}</p>
+                            <button class="close-notification"><i class="fas fa-times"></i></button>
+                        `;
+                        document.body.appendChild(notification);
+                        
+                        // Add click event to close button
+                        notification.querySelector('.close-notification').addEventListener('click', function() {
+                            notification.classList.add('fade-out');
+                            setTimeout(() => {
+                                notification.remove();
+                            }, 500);
+                        });
+                        
+                        // Auto remove after 5 seconds
+                        setTimeout(() => {
+                            if (document.body.contains(notification)) {
+                                notification.classList.add('fade-out');
+                                setTimeout(() => {
+                                    notification.remove();
+                                }, 500);
+                            }
+                        }, 5000);
+                        
+                        // Remove the entry from the UI
+                        state.stockHistory = state.stockHistory.filter(item => item.id !== entry.id);
+                        
+                        // Update the product stock in the UI
+                        document.getElementById('productStock').textContent = data.product.current_stock;
+                        
+                        // Refresh the table
+                        updateHistoryTable();
+                    })
+                    .catch(error => {
+                        console.error('Error deleting stock history:', error);
+                        alert('Failed to delete stock history. Please try again.');
+                    });
                 }
             };
         });
@@ -257,12 +501,14 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.onclick = function(e) {
             e.stopPropagation();
             const row = this.closest('tr');
+            const productId = row.dataset.productId;
             const [code, name] = row.cells[1].textContent.split(' - ');
             handleViewProduct({
+                id: productId, // Use the actual product ID from the database
                 code: code,
                 name: name,
-                description: 'Sample Product only',
-                price: '150.59'
+                description: 'Loading product details...',
+                price: 'Loading...'
             });
         };
     });

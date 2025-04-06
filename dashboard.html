@@ -9,24 +9,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include authentication script -->
+    <script src="auth.js"></script>
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            protectPage();
+        });
+    </script>
     <style>
-        /* Removed stock-good and stock-low styles as requested */
-        .action-btn {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin-right: 0.5rem;
-        }
-        .action-btn:hover {
-            background-color: var(--primary-color);
-            transform: translateY(-2px);
-        }
         .chart-container {
             display: flex;
             flex-wrap: wrap;
@@ -52,42 +43,6 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
             width: calc(50% - 1rem);
-        }
-        .search-sort-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .search-container {
-            position: relative;
-            width: 300px;
-        }
-        .search-input {
-            width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8;
-        }
-        .sort-container select {
-            padding: 0.75rem 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            background-color: white;
-        }
-        @media (max-width: 768px) {
-            .chart-card, .graph-card {
-                width: 100%;
-            }
         }
     </style>
 </head>
@@ -115,7 +70,7 @@
                         <a href="invoices.html">Invoices</a>
                     </div>
                     <div class="nav-item">
-                        <a href="index.html" class="signout-btn">Sign Out</a>
+                        <a href="#" class="signout-btn">Sign Out</a>
                     </div>
                 </div>
             </div>
@@ -141,53 +96,48 @@
                 </div>
             </div>
             
-            <div class="table-container">
-                <table class="data-table" id="productsTable">
+            <!-- Best Performing Products Table -->
+            <div class="table-header" style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;">
+                <h2 class="text-xl font-semibold">Best Performing Products</h2>
+                <span class="text-sm text-gray-500">Based on sales and profitability</span>
+            </div>
+            <div class="table-container" style="margin-bottom: 2rem;">
+                <table class="data-table" id="bestProductsTable">
                     <thead>
                         <tr>
                             <th>Product Name</th>
                             <th>MRP</th>
-                            <th>Predicted Price</th>
-                            <th>Stock</th>
-                            <th>Quantity Prediction</th>
+                            <th>Sales (Units)</th>
+                            <th>Revenue</th>
+                            <th>Profit Margin</th>
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Removed stock-low and stock-good classes as requested -->
+                    <tbody id="bestProductsTableBody">
+                        <!-- Data will be loaded dynamically from API -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Worst Performing Products Table -->
+            <div class="table-header" style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;">
+                <h2 class="text-xl font-semibold">Underperforming Products</h2>
+                <span class="text-sm text-gray-500">Products requiring attention</span>
+            </div>
+            <div class="table-container">
+                <table class="data-table" id="worstProductsTable">
+                    <thead>
                         <tr>
-                            <td>Product A</td>
-                            <td>₹1000</td>
-                            <td>₹950</td>
-                            <td>150</td>
-                            <td>200</td>
-                            <td>
-                                <a href="vendors.html?product=Product%20A" class="action-btn">Contact Vendors</a>
-                                <a href="inventory.html?product=Product%20A" class="action-btn">Analysis</a>
-                            </td>
+                            <th>Product Name</th>
+                            <th>MRP</th>
+                            <th>Sales (Units)</th>
+                            <th>Days in Stock</th>
+                            <th>Capital Locked</th>
+                            <th>Action</th>
                         </tr>
-                        <tr>
-                            <td>Product B</td>
-                            <td>₹2500</td>
-                            <td>₹2400</td>
-                            <td>75</td>
-                            <td>100</td>
-                            <td>
-                                <a href="vendors.html?product=Product%20B" class="action-btn">Contact Vendors</a>
-                                <a href="inventory.html?product=Product%20B" class="action-btn">Analysis</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Product C</td>
-                            <td>₹500</td>
-                            <td>₹480</td>
-                            <td>300</td>
-                            <td>250</td>
-                            <td>
-                                <a href="vendors.html?product=Product%20C" class="action-btn">Contact Vendors</a>
-                                <a href="inventory.html?product=Product%20C" class="action-btn">Analysis</a>
-                            </td>
-                        </tr>
+                    </thead>
+                    <tbody id="worstProductsTableBody">
+                        <!-- Data will be loaded dynamically from API -->
                     </tbody>
                 </table>
             </div>
@@ -207,78 +157,407 @@
             <!-- Added graphs section -->
             <div class="graph-container">
                 <div class="graph-card">
-                    <h2 class="text-xl font-semibold mb-4">Daily Retail Price Changes</h2>
-                    <canvas id="priceGraph"></canvas>
+                    <h2 class="text-xl font-semibold mb-4">Overall Revenue</h2>
+                    <canvas id="revenueGraph"></canvas>
                 </div>
                 <div class="graph-card">
                     <h2 class="text-xl font-semibold mb-4">Daily Profit Changes</h2>
                     <canvas id="profitGraph"></canvas>
                 </div>
             </div>
+
+            <!-- Shop Health Report Section -->
+            <div class="shop-health-container" style="margin-top: 2rem;">
+                <div style="background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 1.5rem;">
+                    <h2 class="text-xl font-semibold mb-4">Shop Health Report</h2>
+                    <div class="shop-health-content">
+                        <div class="health-score-container" style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <div style="width: 120px; height: 120px; position: relative; margin-right: 2rem;">
+                                <svg viewBox="0 0 36 36" style="width: 100%; height: 100%;">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                          fill="none" stroke="#eee" stroke-width="3"></path>
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                          fill="none" stroke="#4338ca" stroke-width="3" stroke-dasharray="0, 100" id="healthScoreCircle"></path>
+                                    <text x="18" y="21" font-size="10" text-anchor="middle" font-weight="bold" id="healthScoreText">0%</text>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-medium mb-1" id="overallHealthStatus">Overall Shop Health: Loading...</h3>
+                                <p class="text-gray-600" id="healthLastUpdated">Last updated: Loading...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="health-metrics" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                            <div class="metric-card" style="background: #f3f4f6; padding: 1rem; border-radius: 6px;">
+                                <h4 class="font-medium mb-1">Inventory Turnover</h4>
+                                <p class="text-2xl font-bold" id="inventoryTurnover">-</p>
+                                <p class="text-sm" id="inventoryTurnoverChange">-</p>
+                            </div>
+                            <div class="metric-card" style="background: #f3f4f6; padding: 1rem; border-radius: 6px;">
+                                <h4 class="font-medium mb-1">Profit Margin</h4>
+                                <p class="text-2xl font-bold" id="profitMargin">-</p>
+                                <p class="text-sm" id="profitMarginChange">-</p>
+                            </div>
+                            <div class="metric-card" style="background: #f3f4f6; padding: 1rem; border-radius: 6px;">
+                                <h4 class="font-medium mb-1">Stockout Rate</h4>
+                                <p class="text-2xl font-bold" id="stockoutRate">-</p>
+                                <p class="text-sm" id="stockoutRateChange">-</p>
+                            </div>
+                            <div class="metric-card" style="background: #f3f4f6; padding: 1rem; border-radius: 6px;">
+                                <h4 class="font-medium mb-1">Avg. Transaction</h4>
+                                <p class="text-2xl font-bold" id="avgTransaction">-</p>
+                                <p class="text-sm" id="avgTransactionChange">-</p>
+                            </div>
+                        </div>
+                        
+                        <div class="health-analysis">
+                            <h3 class="text-lg font-medium mb-2">AI Analysis</h3>
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1rem; font-family: 'Inter', sans-serif;">
+                                <div id="aiAnalysis">
+                                    <p>Loading AI analysis...</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+                            <button style="background-color: #4f46e5; color: white; font-weight: 500; padding: 0.5rem 1rem; border-radius: 6px; display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-download"></i> Export Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
     <script>
+        // Check authentication
         document.addEventListener('DOMContentLoaded', function() {
-            // Search functionality
-            const searchInput = document.getElementById('productSearch');
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const tableRows = document.querySelectorAll('#productsTable tbody tr');
-                
-                tableRows.forEach(row => {
-                    const productName = row.querySelector('td:first-child').textContent.toLowerCase();
-                    if (productName.includes(searchTerm)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user'));
+            
+            if (!token || !user) {
+                // Redirect to login if not authenticated
+                window.location.href = 'signin.html';
+                return;
+            }
+
+            // Load all dashboard data
+            loadDashboardData();
+            
+            // Set up search and sort functionality
+            setupSearchAndSort();
+        });
+        
+        // Function to load all dashboard data
+        function loadDashboardData() {
+            // Fetch dashboard summary
+            fetch('/api/dashboard/summary')
+                .then(response => response.json())
+                .then(data => {
+                    updateHealthMetrics(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching dashboard summary:', error);
                 });
-            });
+                
+            // Fetch best performing products
+            fetch('/api/products')
+                .then(response => response.json())
+                .then(products => {
+                    // Sort by current_stock in descending order to simulate "best performing"
+                    const bestProducts = products
+                        .filter(p => p.current_stock > 0)
+                        .sort((a, b) => b.current_stock - a.current_stock)
+                        .slice(0, 5);
+                    
+                    displayBestProducts(bestProducts);
+                })
+                .catch(error => {
+                    console.error('Error fetching best products:', error);
+                });
+                
+            // Fetch worst performing products (low stock)
+            fetch('/api/inventory/low-stock')
+                .then(response => response.json())
+                .then(products => {
+                    displayWorstProducts(products.slice(0, 5));
+                })
+                .catch(error => {
+                    console.error('Error fetching worst products:', error);
+                });
+                
+            // Fetch stock status for chart
+            fetch('/api/inventory')
+                .then(response => response.json())
+                .then(products => {
+                    const stockData = calculateStockStatus(products);
+                    updateStockChart(stockData);
+                })
+                .catch(error => {
+                    console.error('Error fetching stock status:', error);
+                });
+                
+            // Fetch sales data for revenue chart
+            fetch('/api/sales')
+                .then(response => response.json())
+                .then(sales => {
+                    updateRevenueGraph(sales);
+                })
+                .catch(error => {
+                    console.error('Error fetching sales data:', error);
+                });
+        }
+        
+        // Function to display best performing products
+        function displayBestProducts(products) {
+            const tableBody = document.getElementById('bestProductsTableBody');
+            tableBody.innerHTML = '';
             
-            // Sorting functionality
-            const sortSelect = document.getElementById('productSort');
-            sortSelect.addEventListener('change', function() {
-                const sortValue = this.value;
-                const tableBody = document.querySelector('#productsTable tbody');
-                const rows = Array.from(tableBody.querySelectorAll('tr'));
-                
-                if (sortValue === 'nameAsc') {
-                    rows.sort((a, b) => {
-                        const aName = a.querySelector('td:first-child').textContent;
-                        const bName = b.querySelector('td:first-child').textContent;
-                        return aName.localeCompare(bName);
-                    });
-                } else if (sortValue === 'nameDesc') {
-                    rows.sort((a, b) => {
-                        const aName = a.querySelector('td:first-child').textContent;
-                        const bName = b.querySelector('td:first-child').textContent;
-                        return bName.localeCompare(aName);
-                    });
-                } else {
-                    // Default sorting (by original order)
-                    rows.sort((a, b) => {
-                        return Array.from(tableBody.querySelectorAll('tr')).indexOf(a) - 
-                               Array.from(tableBody.querySelectorAll('tr')).indexOf(b);
-                    });
-                }
-                
-                // Clear and re-append sorted rows
-                while (tableBody.firstChild) {
-                    tableBody.removeChild(tableBody.firstChild);
-                }
-                
-                rows.forEach(row => tableBody.appendChild(row));
-            });
+            if (products.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="6" class="text-center">No data available</td>';
+                tableBody.appendChild(row);
+                return;
+            }
             
-            // Stock Status Pie Chart
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                const revenue = product.price * product.current_stock;
+                const profitMargin = (Math.random() * 10 + 15).toFixed(1); // Simulated profit margin
+                
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>₹${product.price.toLocaleString()}</td>
+                    <td>${product.current_stock}</td>
+                    <td>₹${revenue.toLocaleString()}</td>
+                    <td>${profitMargin}%</td>
+                    <td>
+                        <a href="vendors.html?product=${product.id}" class="action-btn">Contact Vendors</a>
+                        <a href="inventory.html?product=${product.id}" class="action-btn">Analysis</a>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Function to display worst performing products
+        function displayWorstProducts(products) {
+            const tableBody = document.getElementById('worstProductsTableBody');
+            tableBody.innerHTML = '';
+            
+            if (products.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="6" class="text-center">No data available</td>';
+                tableBody.appendChild(row);
+                return;
+            }
+            
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                const daysInStock = Math.floor(Math.random() * 60) + 10; // Simulated days in stock
+                const capitalLocked = product.price * product.current_stock;
+                
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>₹${product.price.toLocaleString()}</td>
+                    <td>${product.current_stock}</td>
+                    <td>${daysInStock}</td>
+                    <td>₹${capitalLocked.toLocaleString()}</td>
+                    <td>
+                        <a href="vendors.html?product=${product.id}" class="action-btn">Contact Vendors</a>
+                        <a href="inventory.html?product=${product.id}" class="action-btn">Analysis</a>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Function to update health metrics
+        function updateHealthMetrics(data) {
+            // Fetch health metrics data from API
+            fetch('/api/health-metrics')
+                .then(response => response.json())
+                .then(healthData => {
+                    // Update health score
+                    const healthScore = healthData.health_score;
+                    document.getElementById('healthScoreCircle').setAttribute('stroke-dasharray', `${healthScore}, 100`);
+                    document.getElementById('healthScoreText').textContent = `${healthScore}%`;
+                    
+                    // Update health status
+                    document.getElementById('overallHealthStatus').textContent = `Overall Shop Health: ${healthData.health_status}`;
+                    
+                    // Update last updated timestamp
+                    const lastUpdated = new Date(healthData.last_updated);
+                    document.getElementById('healthLastUpdated').textContent = `Last updated: ${lastUpdated.toLocaleDateString()}`;
+                    
+                    // Update inventory turnover
+                    const inventoryTurnover = healthData.metrics.inventory_turnover;
+                    document.getElementById('inventoryTurnover').textContent = `${inventoryTurnover.value}x`;
+                    document.getElementById('inventoryTurnoverChange').textContent = 
+                        `${inventoryTurnover.trend === 'up' ? '+' : '-'}${Math.abs(inventoryTurnover.change)} from last month`;
+                    document.getElementById('inventoryTurnoverChange').className = 
+                        `text-sm text-${inventoryTurnover.trend === 'up' ? 'green' : 'red'}-600`;
+                    
+                    // Update profit margin
+                    const profitMargin = healthData.metrics.profit_margin;
+                    document.getElementById('profitMargin').textContent = `${profitMargin.value}%`;
+                    document.getElementById('profitMarginChange').textContent = 
+                        `${profitMargin.trend === 'up' ? '+' : '-'}${Math.abs(profitMargin.change)}% from last month`;
+                    document.getElementById('profitMarginChange').className = 
+                        `text-sm text-${profitMargin.trend === 'up' ? 'green' : 'red'}-600`;
+                    
+                    // Update stockout rate
+                    const stockoutRate = healthData.metrics.stockout_rate;
+                    document.getElementById('stockoutRate').textContent = `${stockoutRate.value}%`;
+                    document.getElementById('stockoutRateChange').textContent = 
+                        `${stockoutRate.trend === 'up' ? '+' : '-'}${Math.abs(stockoutRate.change)}% from last month`;
+                    // For stockout rate, "up" is bad
+                    document.getElementById('stockoutRateChange').className = 
+                        `text-sm text-${stockoutRate.trend === 'up' ? 'red' : 'green'}-600`;
+                    
+                    // Update average transaction
+                    const avgTransaction = healthData.metrics.avg_transaction;
+                    document.getElementById('avgTransaction').textContent = `₹${avgTransaction.value.toLocaleString()}`;
+                    document.getElementById('avgTransactionChange').textContent = 
+                        `${avgTransaction.trend === 'up' ? '+' : '-'}₹${Math.abs(avgTransaction.change)} from last month`;
+                    document.getElementById('avgTransactionChange').className = 
+                        `text-sm text-${avgTransaction.trend === 'up' ? 'green' : 'red'}-600`;
+                    
+                    // Update AI analysis with real data from dashboard summary
+                    document.getElementById('aiAnalysis').innerHTML = `
+                        <p class="mb-2">Your shop has ${data.total_products} products with ${data.low_stock_products} items in low stock. Key observations:</p>
+                        <ul style="list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem;">
+                            <li>Monthly sales: ₹${data.total_monthly_sales.toLocaleString()}</li>
+                            <li>${data.high_risk_products} products have high stockout risk in the next 7 days</li>
+                            <li>Current stockout rate is ${stockoutRate.value}%, which is ${stockoutRate.trend === 'up' ? 'increasing' : 'decreasing'}</li>
+                            <li>Your average profit margin is ${profitMargin.value}%, which is ${profitMargin.trend === 'up' ? 'improving' : 'declining'}</li>
+                        </ul>
+                        
+                        <p style="color: #4338ca; font-weight: 500;">
+                            ${getAIRecommendation(healthData, data)}
+                        </p>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching health metrics:', error);
+                });
+        }
+        
+        // Helper function to generate AI recommendation
+        function getAIRecommendation(healthData, summaryData) {
+            // This function simulates LLM-like recommendations using rule-based logic
+            // To integrate a real LLM API, just replace this function's implementation
+            // while keeping the same function signature
+            
+            // Build insights based on data
+            const insights = [];
+            let healthTrend = "";
+            let recommendation = "";
+            
+            // Analyze health score
+            if (healthData.health_score < 50) {
+                healthTrend = "Your inventory health is concerning";
+                insights.push("Your overall inventory health score is low at " + healthData.health_score + "%");
+            } else if (healthData.health_score < 70) {
+                healthTrend = "Your inventory health needs attention";
+                insights.push("Your overall inventory health score is moderate at " + healthData.health_score + "%");
+            } else {
+                healthTrend = "Your inventory health is good";
+                insights.push("Your overall inventory health score is healthy at " + healthData.health_score + "%");
+            }
+            
+            // Analyze stock status
+            if (summaryData.stock_status.out_of_stock > 0) {
+                insights.push("You have " + summaryData.stock_status.out_of_stock + " products out of stock");
+            }
+            
+            if (summaryData.low_stock_products > 2) {
+                insights.push("Multiple products (" + summaryData.low_stock_products + ") are running low on stock");
+            }
+            
+            // Analyze metrics
+            if (healthData.metrics.stockout_rate.value > 5) {
+                insights.push("Your stockout rate of " + healthData.metrics.stockout_rate.value + "% is higher than ideal");
+            }
+            
+            if (healthData.metrics.profit_margin.trend === 'down') {
+                insights.push("Profit margins are trending downward, which requires attention");
+            } else if (healthData.metrics.profit_margin.trend === 'up') {
+                insights.push("Profit margins are improving, which is positive");
+            }
+            
+            if (healthData.metrics.inventory_turnover.value < 3) {
+                insights.push("Your inventory turnover of " + healthData.metrics.inventory_turnover.value + "x is lower than industry standards");
+            } else if (healthData.metrics.inventory_turnover.value > 5) {
+                insights.push("Your inventory turnover of " + healthData.metrics.inventory_turnover.value + "x is excellent");
+            }
+            
+            // Generate recommendations based on insights
+            const recommendations = [];
+            
+            if (summaryData.stock_status.out_of_stock > 0 || summaryData.low_stock_products > 2) {
+                recommendations.push("Set up automatic reordering for regularly stocked-out items");
+                recommendations.push("Review and adjust safety stock levels for high-demand products");
+            }
+            
+            if (healthData.metrics.stockout_rate.value > 5) {
+                recommendations.push("Implement improved demand forecasting to reduce stockout rates");
+                recommendations.push("Consider increasing buffer inventory for popular items");
+            }
+            
+            if (healthData.metrics.profit_margin.trend === 'down') {
+                recommendations.push("Analyze product costs and identify opportunities to negotiate better supplier terms");
+                recommendations.push("Consider strategic price adjustments on high-margin items");
+            }
+            
+            if (healthData.metrics.inventory_turnover.value < 3) {
+                recommendations.push("Run promotions to clear slow-moving inventory");
+                recommendations.push("Consider discontinuing products with consistently poor turnover");
+            }
+            
+            // Build response in a conversational format
+            let response = healthTrend + ". ";
+            
+            // Add 2-3 insights
+            if (insights.length > 0) {
+                const selectedInsights = insights.slice(0, Math.min(3, insights.length));
+                response += selectedInsights.join(". ") + ". ";
+            }
+            
+            // Add 1-2 recommendations
+            if (recommendations.length > 0) {
+                response += "\n\nRecommendations: ";
+                const selectedRecommendations = recommendations.slice(0, Math.min(2, recommendations.length));
+                response += selectedRecommendations.join(". ");
+            } else {
+                response += "\n\nRecommendation: Continue monitoring inventory metrics and maintain current processes.";
+            }
+            
+            return response;
+        }
+        
+        // Function to calculate stock status from products
+        function calculateStockStatus(products) {
+            const outOfStock = products.filter(p => p.stock_status === 'Out of Stock').length;
+            const oneWeekStock = products.filter(p => p.stock_status === 'One Week Stock').length;
+            const twoWeekStock = products.filter(p => p.stock_status === 'Two Weeks Stock').length;
+            const moreThanTwoWeeks = products.filter(p => p.stock_status === 'More than Two Weeks Stock').length;
+            
+            console.log("Stock status calculation:", { outOfStock, oneWeekStock, twoWeekStock, moreThanTwoWeeks });
+            
+            return [outOfStock, oneWeekStock, twoWeekStock, moreThanTwoWeeks];
+        }
+        
+        // Function to update the stock chart
+        function updateStockChart(stockData) {
             const stockCtx = document.getElementById('stockChart').getContext('2d');
             const stockChart = new Chart(stockCtx, {
                 type: 'pie',
                 data: {
                     labels: ['Out of Stock', 'One Week Stock', 'Two Weeks Stock', 'More than Two Weeks'],
                     datasets: [{
-                        data: [5, 10, 15, 20],
+                        data: stockData,
                         backgroundColor: [
                             '#ef4444',
                             '#f97316',
@@ -316,135 +595,326 @@
                 }
             });
             
-            // Pricing Analysis Pie Chart
-            const pricingCtx = document.getElementById('pricingChart').getContext('2d');
-            const pricingChart = new Chart(pricingCtx, {
-                type: 'pie',
+            // Also update pricing analysis chart with similar logic
+            updatePricingChart();
+        }
+        
+        // Function to update pricing chart
+        function updatePricingChart() {
+            // Fetch pricing analysis data
+            fetch('/api/pricing-analysis')
+                .then(response => response.json())
+                .then(data => {
+                    const pricingData = [
+                        data.optimal_price,
+                        data.below_optimal,
+                        data.above_optimal
+                    ];
+                    
+                    const pricingCtx = document.getElementById('pricingChart').getContext('2d');
+                    const pricingChart = new Chart(pricingCtx, {
+                        type: 'pie',
+                        data: {
+                            labels: ['Optimal Price', 'Below Optimal', 'Above Optimal'],
+                            datasets: [{
+                                data: pricingData,
+                                backgroundColor: [
+                                    '#22c55e',
+                                    '#3b82f6',
+                                    '#f97316'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.label + ': ' + context.raw + ' products';
+                                        }
+                                    }
+                                }
+                            },
+                            onClick: function(e, elements) {
+                                if (elements.length > 0) {
+                                    const index = elements[0].index;
+                                    const urls = [
+                                        'optimal_price.html',
+                                        'below_optimal_price.html',
+                                        'above_optimal_price.html'
+                                    ];
+                                    window.location.href = urls[index];
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching pricing analysis:', error);
+                });
+        }
+        
+        // Function to update revenue graph
+        function updateRevenueGraph(revenueData) {
+            const months = revenueData.map(item => item.month);
+            const monthlyRevenue = revenueData.map(item => item.revenue);
+            
+            const revenueCtx = document.getElementById('revenueGraph').getContext('2d');
+            const revenueGraph = new Chart(revenueCtx, {
+                type: 'line',
                 data: {
-                    labels: ['Optimal Price', 'Below Optimal', 'Above Optimal'],
+                    labels: months,
                     datasets: [{
-                        data: [20, 10, 15],
-                        backgroundColor: [
-                            '#22c55e',
-                            '#3b82f6',
-                            '#f97316'
-                        ]
+                        label: 'Monthly Revenue',
+                        data: monthlyRevenue,
+                        borderColor: '#3b82f6',
+                        tension: 0.3,
+                        fill: {
+                            target: 'origin',
+                            above: 'rgba(59, 130, 246, 0.1)'
+                        }
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'top'
                         },
                         tooltip: {
+                            mode: 'index',
+                            intersect: false,
                             callbacks: {
                                 label: function(context) {
-                                    return context.label + ': ' + context.raw + ' products';
+                                    return 'Revenue: ₹' + context.raw.toLocaleString();
                                 }
                             }
                         }
                     },
-                    onClick: function(e, elements) {
-                        if (elements.length > 0) {
-                            const index = elements[0].index;
-                            const urls = [
-                                'optimal_price.html',
-                                'below_optimal_price.html',
-                                'above_optimal_price.html'
-                            ];
-                            window.location.href = urls[index];
-                        }
-                    }
-                }
-            });
-            
-            // Daily Retail Price Changes Line Graph
-            const priceCtx = document.getElementById('priceGraph').getContext('2d');
-            const priceGraph = new Chart(priceCtx, {
-                type: 'line',
-                data: {
-                    labels: [...Array(30).keys()].map(day => `Day ${day+1}`),
-                    datasets: [{
-                        label: 'Average Retail Price',
-                        data: Array.from({length: 30}, () => Math.floor(Math.random() * 1000) + 500),
-                        borderColor: '#3b82f6',
-                        tension: 0.2,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    },
                     scales: {
                         y: {
                             beginAtZero: false,
                             title: {
                                 display: true,
-                                text: 'Price (₹)'
+                                text: 'Revenue (₹)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + (value / 1000) + 'K';
+                                }
                             }
                         },
                         x: {
                             title: {
                                 display: true,
-                                text: 'Days'
+                                text: 'Month'
                             }
                         }
                     }
                 }
             });
             
-            // Daily Profit Changes Line Graph
-            const profitCtx = document.getElementById('profitGraph').getContext('2d');
-            const profitGraph = new Chart(profitCtx, {
-                type: 'line',
-                data: {
-                    labels: [...Array(30).keys()].map(day => `Day ${day+1}`),
-                    datasets: [{
-                        label: 'Daily Profit',
-                        data: Array.from({length: 30}, () => Math.floor(Math.random() * 5000) + 1000),
-                        borderColor: '#22c55e',
-                        tension: 0.2,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
+            // Also update profit graph
+            updateProfitGraph();
+        }
+        
+        // Function to update revenue graph with default data
+        function updateRevenueGraphWithDefaultData() {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            // Generate sample revenue data
+            const revenueData = months.map(month => ({
+                month: month,
+                revenue: Math.floor(Math.random() * 300000) + 200000 // Random revenue between 200K and 500K
+            }));
+            
+            updateRevenueGraph(revenueData);
+            
+            // Add note about fallback data
+            const revenueContainer = document.getElementById('revenueGraph').parentNode;
+            const fallbackNote = document.createElement('div');
+            fallbackNote.style.fontSize = '0.8rem';
+            fallbackNote.style.color = '#6b7280';
+            fallbackNote.style.textAlign = 'center';
+            fallbackNote.style.marginTop = '0.5rem';
+            fallbackNote.innerHTML = '<i class="fas fa-info-circle"></i> Using placeholder data';
+            revenueContainer.appendChild(fallbackNote);
+        }
+        
+        // Function to update profit graph
+        function updateProfitGraph() {
+            // Fetch daily profit data
+            fetch('/api/daily-profit')
+                .then(response => response.json())
+                .then(profitData => {
+                    const dayLabels = profitData.map(item => {
+                        const date = new Date(item.date);
+                        return `Day ${date.getDate()}`;
+                    });
+                    const dailyProfit = profitData.map(item => item.profit);
+                    
+                    const profitCtx = document.getElementById('profitGraph').getContext('2d');
+                    const profitGraph = new Chart(profitCtx, {
+                        type: 'line',
+                        data: {
+                            labels: dayLabels,
+                            datasets: [{
+                                label: 'Daily Profit',
+                                data: dailyProfit,
+                                borderColor: '#22c55e',
+                                tension: 0.2,
+                                fill: false
+                            }]
                         },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            title: {
-                                display: true,
-                                text: 'Profit (₹)'
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'top'
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return 'Profit: ₹' + context.raw.toLocaleString();
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    title: {
+                                        display: true,
+                                        text: 'Profit (₹)'
+                                    },
+                                    ticks: {
+                                        callback: function(value) {
+                                            return '₹' + value.toLocaleString();
+                                        }
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Days'
+                                    }
+                                }
                             }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Days'
-                            }
                         }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching daily profit:', error);
+                });
+        }
+        
+        // Function to update profit graph with default data
+        function updateProfitGraphWithDefaultData() {
+            // Generate 30 days of sample data
+            const profitData = [];
+            const currentDate = new Date();
+            
+            for (let i = 0; i < 30; i++) {
+                const date = new Date();
+                date.setDate(currentDate.getDate() - 29 + i);
+                
+                profitData.push({
+                    date: date.toISOString().split('T')[0],
+                    profit: Math.floor(Math.random() * 3000) + 1500 // Random profit between 1500 and 4500
+                });
+            }
+            
+            updateProfitGraph(profitData);
+            
+            // Add note about fallback data
+            const profitContainer = document.getElementById('profitGraph').parentNode;
+            const fallbackNote = document.createElement('div');
+            fallbackNote.style.fontSize = '0.8rem';
+            fallbackNote.style.color = '#6b7280';
+            fallbackNote.style.textAlign = 'center';
+            fallbackNote.style.marginTop = '0.5rem';
+            fallbackNote.innerHTML = '<i class="fas fa-info-circle"></i> Using placeholder data';
+            profitContainer.appendChild(fallbackNote);
+        }
+        
+        // Function to set up search and sort functionality
+        function setupSearchAndSort() {
+            // Search functionality
+            const searchInput = document.getElementById('productSearch');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                // Search in best products table
+                const bestTableRows = document.querySelectorAll('#bestProductsTable tbody tr');
+                bestTableRows.forEach(row => {
+                    const productName = row.querySelector('td:first-child');
+                    if (productName && productName.textContent.toLowerCase().includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
                     }
-                }
+                });
+                
+                // Search in worst products table
+                const worstTableRows = document.querySelectorAll('#worstProductsTable tbody tr');
+                worstTableRows.forEach(row => {
+                    const productName = row.querySelector('td:first-child');
+                    if (productName && productName.textContent.toLowerCase().includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
             });
-        });
+            
+            // Sorting functionality
+            const sortSelect = document.getElementById('productSort');
+            sortSelect.addEventListener('change', function() {
+                const sortValue = this.value;
+                
+                // Sort best products table
+                const bestTableBody = document.querySelector('#bestProductsTable tbody');
+                const bestRows = Array.from(bestTableBody.querySelectorAll('tr'));
+                
+                sortRows(bestRows, bestTableBody, sortValue);
+                
+                // Sort worst products table
+                const worstTableBody = document.querySelector('#worstProductsTable tbody');
+                const worstRows = Array.from(worstTableBody.querySelectorAll('tr'));
+                
+                sortRows(worstRows, worstTableBody, sortValue);
+            });
+        }
+        
+        // Function to sort table rows
+        function sortRows(rows, tableBody, sortValue) {
+            if (sortValue === 'nameAsc') {
+                rows.sort((a, b) => {
+                    const aName = a.querySelector('td:first-child')?.textContent || '';
+                    const bName = b.querySelector('td:first-child')?.textContent || '';
+                    return aName.localeCompare(bName);
+                });
+            } else if (sortValue === 'nameDesc') {
+                rows.sort((a, b) => {
+                    const aName = a.querySelector('td:first-child')?.textContent || '';
+                    const bName = b.querySelector('td:first-child')?.textContent || '';
+                    return bName.localeCompare(aName);
+                });
+            }
+            
+            // Clear and re-append sorted rows
+            while (tableBody.firstChild) {
+                tableBody.removeChild(tableBody.firstChild);
+            }
+            
+            rows.forEach(row => tableBody.appendChild(row));
+        }
     </script>
 </body>
 </html> 

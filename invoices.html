@@ -284,7 +284,7 @@
     <script>
         // Hot Reload WebSocket Connection
         const connectWebSocket = () => {
-            const ws = new WebSocket('ws://localhost:8001');
+            const ws = new WebSocket('ws://' + window.location.host + '/ws');
             
             ws.onopen = () => {
                 console.log('WebSocket connected');

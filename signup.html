@@ -6,13 +6,16 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Sign In - Smart Inventory Management System</title>
+    <title>Sign Up - Smart Inventory Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
         .form-input {
             @apply w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-red-700 transition-all duration-200;
+        }
+        .back-link {
+            @apply text-gray-700 hover:text-red-700 flex items-center gap-1 transition-all duration-200;
         }
         /* Using direct styles for better consistency */
         .button-red {
@@ -29,9 +32,6 @@
         }
         .button-red:hover {
             background-color: #b71c1c;
-        }
-        .back-link {
-            @apply text-gray-700 hover:text-red-700 flex items-center gap-1 transition-all duration-200;
         }
     </style>
 </head>
@@ -51,44 +51,68 @@
     </header>
 
     <main class="container mx-auto max-w-md px-6 py-12">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Sign in</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Sign up for free</h1>
         
-        <form id="signinForm" class="space-y-5" onsubmit="handleSignIn(event)">
+        <p class="text-center text-gray-600 mb-6">
+            We recommend using your work email — it keeps work and life separate.
+        </p>
+        
+        <form id="signupForm" class="space-y-5" onsubmit="handleSignUp(event)">
             <div class="space-y-2">
-                <label for="email" class="text-sm font-medium text-gray-700 block">Email</label>
+                <label for="name" class="text-sm font-medium text-gray-700 block">Full Name</label>
+                <input type="text" id="name" name="name" required
+                    class="form-input" placeholder="Your full name">
+            </div>
+            
+            <div class="space-y-2">
+                <label for="email" class="text-sm font-medium text-gray-700 block">Work email</label>
                 <input type="email" id="email" name="email" required
-                    class="form-input" placeholder="Enter your email">
+                    class="form-input" placeholder="name@company.com">
             </div>
             
             <div class="space-y-2">
                 <label for="password" class="text-sm font-medium text-gray-700 block">Password</label>
                 <input type="password" id="password" name="password" required
-                    class="form-input" placeholder="Enter your password">
+                    class="form-input" placeholder="Create a password">
+            </div>
+            
+            <div class="space-y-2">
+                <label for="confirmPassword" class="text-sm font-medium text-gray-700 block">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required
+                    class="form-input" placeholder="Confirm your password">
             </div>
             
             <button type="submit" class="button-red">
-                Sign in
+                Continue
             </button>
         </form>
         
         <div class="text-center mt-8">
+            <p class="text-sm text-gray-600 mb-6">Collaborate with your team within minutes</p>
             <hr class="my-6 border-gray-200" />
             <p class="text-sm text-gray-600 mb-2">
-                Don't have an account? 
-                <a href="signup.html" class="text-red-700 hover:text-red-800 font-medium">Sign up for free</a>
+                Already have an account? 
+                <a href="signin.html" class="text-red-700 hover:text-red-800 font-medium">Sign In</a>
             </p>
         </div>
     </main>
 
     <script>
-        function handleSignIn(event) {
+        function handleSignUp(event) {
             event.preventDefault();
+            const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert("Passwords don't match!");
+                return;
+            }
             
             // Send data to the API
-            const apiUrl = '/api/auth/signin';
-            console.log('Submitting signin form to:', window.location.origin + apiUrl);
+            const apiUrl = '/api/auth/signup';
+            console.log('Submitting signup form to:', window.location.origin + apiUrl);
             
             fetch(apiUrl, {
                 method: 'POST',
@@ -96,6 +120,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
+                    name,
                     email,
                     password
                 }),
@@ -103,19 +128,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Store user info in localStorage
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    localStorage.setItem('token', data.token);
-                    
-                    // Redirect to dashboard
-                    window.location.href = 'dashboard.html';
+                    alert('Account created successfully! Please sign in.');
+                    window.location.href = 'signin.html';
                 } else {
-                    alert(data.message || 'Invalid email or password.');
+                    alert(data.message || 'An error occurred during signup.');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred during sign in.');
+                alert('An error occurred during signup.');
             });
         }
     </script>

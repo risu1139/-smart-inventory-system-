@@ -13,6 +13,187 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- Add HTML5 QR Scanner library -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* QR Scanner styles */
+        .scanner-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        #qr-reader {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        #qr-reader__scan_region {
+            background: #f7f7f7;
+        }
+        
+        .scan-qr-btn {
+            background-color: #4f46e5;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .scan-qr-btn:hover {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Enhanced search box styles for header - completely redesigned */
+        .header-actions .search-box {
+            position: relative;
+            width: 300px;
+            margin-right: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            background-color: white;
+            overflow: hidden;
+        }
+        
+        .header-actions .search-icon {
+            position: static;
+            margin: 0 12px;
+            color: #6b7280;
+            min-width: 16px;
+        }
+        
+        .header-actions .search-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+        
+        .header-actions .search-input:focus {
+            outline: none;
+        }
+        
+        .header-actions .search-box:focus-within {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+        
+        /* Highlight for search matches */
+        .search-match {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+        
+        /* Product Trends Styles */
+        .product-trends-section {
+            margin-top: 2rem;
+        }
+        
+        .trends-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        
+        .trend-chart-wrapper {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .trend-chart-wrapper h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+            text-align: center;
+        }
+        
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+        
+        @media (max-width: 768px) {
+            .trends-container {
+                flex-direction: column;
+            }
+            
+            .trend-chart-wrapper {
+                width: 100%;
+            }
+        }
+        
+        /* Product Analysis Report Styles */
+        .product-report-section {
+            margin-top: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .report-container {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        #reportProductName {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .report-date {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        
+        .report-content {
+            line-height: 1.6;
+        }
+        
+        .report-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .report-content strong {
+            color: #4f46e5;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -49,6 +230,15 @@
         <div class="container">
             <div class="header-section">
                 <h1 class="page-title">Inventory</h1>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="productSearchInput" placeholder="Search products..." class="search-input">
+                    </div>
+                    <button id="scanQrBtn" class="scan-qr-btn">
+                        <i class="fas fa-qrcode"></i> <span>SCAN PRODUCT QR</span>
+                    </button>
+                </div>
             </div>
 
             <div class="table-container">
@@ -170,6 +360,50 @@
                             Next <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
+                    
+                    <!-- Product Trends Section -->
+                    <div class="product-trends-section">
+                        <h3 class="section-title">Product Trends (Last 30 Days)</h3>
+                        <div class="trends-container">
+                            <div class="trend-chart-wrapper">
+                                <h4>Price History</h4>
+                                <div class="chart-container">
+                                    <canvas id="priceHistoryChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="trend-chart-wrapper">
+                                <h4>Stock Level History</h4>
+                                <div class="chart-container">
+                                    <canvas id="stockHistoryChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Analysis Report Section -->
+                    <div class="product-report-section">
+                        <h3 class="section-title">Product Analysis Report</h3>
+                        <div class="report-container">
+                            <div class="report-header">
+                                <div id="reportProductName">Product Analysis</div>
+                                <div class="report-date">Generated on: <span id="reportDate"></span></div>
+                            </div>
+                            <div class="report-content">
+                                <p>
+                                    <strong>Overview:</strong> <span id="productOverview"></span>
+                                </p>
+                                <p>
+                                    <strong>Price Analysis:</strong> <span id="priceAnalysis"></span>
+                                </p>
+                                <p>
+                                    <strong>Stock Trends:</strong> <span id="stockAnalysis"></span>
+                                </p>
+                                <p>
+                                    <strong>Recommendations:</strong> <span id="recommendations"></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -190,7 +424,476 @@
         </div>
     </div>
 
+    <!-- QR Scanner Modal -->
+    <div id="scannerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">Scan QR Code</h2>
+            <div class="scanner-container">
+                <div id="qr-reader"></div>
+                <div id="qr-reader-results"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Load JavaScript at the end -->
     <script src="inventory.js" defer></script>
+    <script>
+        // QR Code Scanner functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const scannerModal = document.getElementById('scannerModal');
+            const scanQrBtn = document.getElementById('scanQrBtn');
+            const closeButtons = document.querySelectorAll('.close-modal');
+            
+            // Initialize QR Scanner when button is clicked
+            scanQrBtn.addEventListener('click', function() {
+                scannerModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+                // Initialize QR Scanner
+                const html5QrCode = new Html5Qrcode("qr-reader");
+                const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                    // Stop scanning
+                    html5QrCode.stop().then(() => {
+                        console.log('QR Code scanning stopped.');
+                        handleQrCode(decodedText);
+                    }).catch((err) => {
+                        console.log('Error stopping QR Code scanner:', err);
+                    });
+                };
+                
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                
+                // Start scanning
+                html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+                
+                // Add event listener to stop scanning when modal is closed
+                closeButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        html5QrCode.stop().catch(err => console.error(err));
+                        scannerModal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    });
+                });
+            });
+            
+            // Handle QR Code result
+            function handleQrCode(qrData) {
+                console.log('QR Code detected:', qrData);
+                
+                // Find the product in the table that matches the QR code data
+                // Format expected: SMART_INV_[timestamp]_[random]
+                // This is for demo purposes - in a real app, you'd query a database
+                
+                if (qrData.startsWith('SMART_INV_')) {
+                    // For demo, we'll just open the first product
+                    const viewButtons = document.querySelectorAll('.view-btn');
+                    if (viewButtons.length > 0) {
+                        // Close the scanner modal
+                        scannerModal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                        
+                        // Click the first view button
+                        viewButtons[0].click();
+                    } else {
+                        alert('No products found in the inventory.');
+                    }
+                } else {
+                    alert('Invalid QR code format. Please scan a valid product QR code.');
+                }
+            }
+        });
+        
+        // Product search functionality for main inventory table
+        document.addEventListener('DOMContentLoaded', function() {
+            const productSearchInput = document.getElementById('productSearchInput');
+            const inventoryTable = document.getElementById('inventoryTable');
+            const tableRows = inventoryTable.querySelectorAll('tbody tr');
+            
+            productSearchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                tableRows.forEach(row => {
+                    const productText = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                    
+                    // Remove any previous highlighting
+                    row.classList.remove('search-match');
+                    
+                    if (searchTerm.length > 0) {
+                        if (productText.includes(searchTerm)) {
+                            row.style.display = '';
+                            row.classList.add('search-match');
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    } else {
+                        row.style.display = '';
+                    }
+                });
+                
+                // If no results are showing, maybe display a message
+                const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+                const tbody = inventoryTable.querySelector('tbody');
+                
+                // Remove existing "no results" message if it exists
+                const existingMessage = tbody.querySelector('.no-results-row');
+                if (existingMessage) {
+                    tbody.removeChild(existingMessage);
+                }
+                
+                if (visibleRows.length === 0 && searchTerm.length > 0) {
+                    const noResultsRow = document.createElement('tr');
+                    noResultsRow.className = 'no-results-row';
+                    noResultsRow.innerHTML = `<td colspan="4" style="text-align: center; padding: 1rem;">No products found matching "${searchTerm}"</td>`;
+                    tbody.appendChild(noResultsRow);
+                }
+            });
+        });
+        
+        // Product Trends Charts initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart instances to manage updates
+            let priceChart = null;
+            let stockChart = null;
+            
+            // Initialize charts when product details are loaded
+            const viewButtons = document.querySelectorAll('.view-btn');
+            viewButtons.forEach((button, index) => {
+                button.addEventListener('click', function() {
+                    // Get product information from the table
+                    const row = button.closest('tr');
+                    const productInfo = row.querySelector('td:nth-child(2)').textContent;
+                    const stockLevel = parseInt(row.querySelector('td:nth-child(3)').textContent);
+                    
+                    // Show product details section
+                    const productDetails = document.getElementById('productDetails');
+                    productDetails.classList.remove('hidden');
+                    
+                    // Update product details
+                    document.getElementById('productName').textContent = productInfo.split(' - ')[1] || productInfo;
+                    document.getElementById('productCode').textContent = productInfo.split(' - ')[0] || '123456';
+                    
+                    // Initialize or update charts with product-specific data
+                    initializeCharts(index, productInfo, stockLevel);
+                    
+                    // Generate product report
+                    generateProductReport(productInfo, stockLevel);
+                    
+                    // Scroll to product details
+                    productDetails.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+            function initializeCharts(productIndex, productName, currentStock) {
+                // Generate product-specific data based on product index and current stock
+                const dates = generateDates(30);
+                const priceData = generatePriceData(30, productIndex);
+                const stockData = generateStockData(30, productIndex, currentStock);
+                
+                // Initialize or update price chart
+                initializePriceChart(dates, priceData, productName, productIndex);
+                
+                // Initialize or update stock chart
+                initializeStockChart(dates, stockData, productName);
+            }
+            
+            // Initialize Price History Chart
+            function initializePriceChart(dates, priceData, productName, productIndex) {
+                const ctx = document.getElementById('priceHistoryChart').getContext('2d');
+                
+                // Generate recommended price data
+                const recommendedPriceData = generateRecommendedPriceData(30, productIndex, priceData);
+                
+                // Determine if actual price is above recommended price (on average)
+                const actualPriceAvg = priceData.reduce((sum, price) => sum + price, 0) / priceData.length;
+                const recommendedPriceAvg = recommendedPriceData.reduce((sum, price) => sum + price, 0) / recommendedPriceData.length;
+                const isPriceHigher = actualPriceAvg > recommendedPriceAvg;
+                
+                // Set price line color based on comparison with recommended price
+                const priceLineColor = isPriceHigher ? 'rgba(239, 68, 68, 1)' : 'rgba(34, 197, 94, 1)';
+                const priceBackgroundColor = isPriceHigher ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)';
+                
+                // Destroy existing chart if it exists
+                if (priceChart) {
+                    priceChart.destroy();
+                }
+                
+                priceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [
+                            {
+                                label: `${productName} - Actual Price (₹)`,
+                                data: priceData,
+                                borderColor: priceLineColor,
+                                backgroundColor: priceBackgroundColor,
+                                tension: 0.4,
+                                fill: true,
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Recommended Price (₹)',
+                                data: recommendedPriceData,
+                                borderColor: 'rgba(59, 130, 246, 1)',
+                                borderDash: [5, 5],
+                                tension: 0.4,
+                                fill: false,
+                                borderWidth: 2,
+                                pointRadius: 0
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label.includes('Actual') 
+                                            ? `Actual Price: ₹${context.raw.toFixed(2)}` 
+                                            : `Recommended Price: ₹${context.raw.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Price (₹)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    maxTicksLimit: 7
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+                
+                // Update the price analysis in the report based on comparison
+                updatePriceAnalysisReport(productName.split(' - ')[1] || productName, isPriceHigher, actualPriceAvg, recommendedPriceAvg);
+            }
+            
+            // Helper function to generate recommended price data
+            function generateRecommendedPriceData(days, productIndex, actualPrices) {
+                const recommendedPrices = [];
+                // Base price depends on product index to make each product unique
+                let baseRecommendedPrice = 95 + (productIndex * 25);
+                
+                for (let i = 0; i < days; i++) {
+                    // Generate a more stable line for recommended prices
+                    // Create slight fluctuations that are less dramatic than actual prices
+                    const randomSeed = Math.sin(i * 0.3 + productIndex) * 0.3;
+                    const change = randomSeed * 2;
+                    baseRecommendedPrice += change;
+                    
+                    // Make the recommended price relative to actual price
+                    // Sometimes higher, sometimes lower (for different products)
+                    const actualBaseline = actualPrices[i] || 100;
+                    
+                    // If product index is even, recommended price tends to be lower
+                    // If product index is odd, recommended price tends to be higher
+                    const modifier = productIndex % 2 === 0 ? 0.95 : 1.05;
+                    const recommendedPrice = actualBaseline * modifier + (randomSeed * 5);
+                    
+                    recommendedPrices.push(parseFloat(recommendedPrice.toFixed(2)));
+                }
+                
+                return recommendedPrices;
+            }
+            
+            // Update the price analysis report based on the price comparison
+            function updatePriceAnalysisReport(productName, isPriceHigher, actualPrice, recommendedPrice) {
+                const priceDiffPercent = Math.abs(((actualPrice - recommendedPrice) / recommendedPrice) * 100).toFixed(1);
+                const priceStatus = isPriceHigher ? "above" : "below";
+                
+                let priceAnalysisText = '';
+                if (isPriceHigher) {
+                    priceAnalysisText = `${productName} is currently priced ${priceDiffPercent}% above the recommended market price. This may affect competitiveness and sales velocity. Consider adjusting pricing strategy to align more closely with market expectations.`;
+                } else {
+                    priceAnalysisText = `${productName} is currently priced ${priceDiffPercent}% below the recommended market price. While this ensures competitiveness, there may be room to optimize profit margins without significantly impacting sales.`;
+                }
+                
+                document.getElementById('priceAnalysis').textContent = priceAnalysisText;
+            }
+            
+            // Initialize Stock History Chart
+            function initializeStockChart(dates, stockData, productName) {
+                const ctx = document.getElementById('stockHistoryChart').getContext('2d');
+                
+                // Destroy existing chart if it exists
+                if (stockChart) {
+                    stockChart.destroy();
+                }
+                
+                stockChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: `${productName} - Stock Level`,
+                            data: stockData,
+                            borderColor: 'rgba(34, 197, 94, 1)',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    maxTicksLimit: 7
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Generate the product analysis report
+            function generateProductReport(productName, currentStock) {
+                // Set the report date to today
+                const today = new Date();
+                document.getElementById('reportDate').textContent = today.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                
+                // Set the product name in the report
+                document.getElementById('reportProductName').textContent = productName;
+                
+                // Generate static report content based on the product
+                const productNameClean = productName.includes(' - ') ? productName.split(' - ')[1] : productName;
+                
+                // Product overview
+                document.getElementById('productOverview').textContent = 
+                    `${productNameClean} is showing moderate performance in the inventory. The product has maintained consistent stock levels with periodic replenishments. Current stock level is ${currentStock} units.`;
+                
+                // Price analysis
+                document.getElementById('priceAnalysis').textContent = 
+                    `${productNameClean} has experienced a gradual increase in price over the last month, with an average increase of approximately 3.2%. This price trend aligns with market inflation rates while maintaining competitive positioning.`;
+                
+                // Stock analysis
+                let stockTrend = "stable";
+                if (currentStock < 20) {
+                    stockTrend = "declining";
+                } else if (currentStock > 50) {
+                    stockTrend = "well-stocked";
+                }
+                
+                document.getElementById('stockAnalysis').textContent = 
+                    `Stock levels for ${productNameClean} have been ${stockTrend} over the past month. The product has shown a turnover rate of approximately ${Math.floor(Math.random() * 10) + 5}% weekly, indicating ${stockTrend === "declining" ? "strong" : "moderate"} customer demand.`;
+                
+                // Recommendations
+                if (currentStock < 20) {
+                    document.getElementById('recommendations').textContent = 
+                        `It is recommended to restock ${productNameClean} within the next 7 days to prevent stockouts. Consider increasing the order quantity by 20% to account for the recent increase in demand.`;
+                } else if (currentStock > 70) {
+                    document.getElementById('recommendations').textContent = 
+                        `${productNameClean} inventory levels are higher than optimal. Consider introducing promotional offers to increase turnover or reducing the next procurement cycle quantity by 15%.`;
+                } else {
+                    document.getElementById('recommendations').textContent = 
+                        `Current inventory levels for ${productNameClean} are optimal. Continue with the existing procurement cycle and monitor price trends to optimize pricing strategy.`;
+                }
+            }
+            
+            // Helper function to generate dates for the last n days
+            function generateDates(days) {
+                const dates = [];
+                const today = new Date();
+                
+                for (let i = days - 1; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(today.getDate() - i);
+                    dates.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                }
+                
+                return dates;
+            }
+            
+            // Helper function to generate product-specific price data
+            function generatePriceData(days, productIndex) {
+                const prices = [];
+                // Base price depends on product index to make each product unique
+                let basePrice = 100 + (productIndex * 25);
+                
+                for (let i = 0; i < days; i++) {
+                    // Add some random variation with a slight upward trend
+                    // Use product index to create consistent but different patterns for each product
+                    const randomSeed = Math.sin(i + productIndex) * 0.5;
+                    const change = (randomSeed - 0.2) * 3;
+                    basePrice += change;
+                    // Ensure price doesn't go below a minimum
+                    basePrice = Math.max(80 + (productIndex * 20), basePrice);
+                    prices.push(parseFloat(basePrice.toFixed(2)));
+                }
+                
+                return prices;
+            }
+            
+            // Helper function to generate product-specific stock data
+            function generateStockData(days, productIndex, currentStock) {
+                const stock = [];
+                // Start with a value that will reach approximately the current stock level
+                let startingStock = currentStock + (Math.random() > 0.5 ? 10 : -10);
+                startingStock = Math.max(startingStock, currentStock);
+                
+                // Generate stock history with a pattern that ends close to the current stock value
+                for (let i = 0; i < days - 1; i++) {
+                    // Create a deterministic but varied pattern based on the product index
+                    const dayEffect = Math.sin((i * (productIndex + 1) % 7) * 0.5) * 3;
+                    const change = Math.round((Math.random() - 0.5 + dayEffect) * 3);
+                    
+                    // Calculate backward from current stock to create a history
+                    const pastStock = startingStock + ((days - i) % 3 == 0 ? change * 2 : change);
+                    
+                    // Ensure stock doesn't go below 0
+                    stock.push(Math.max(0, pastStock));
+                }
+                
+                // Add the current stock as the final value
+                stock.push(currentStock);
+                
+                return stock;
+            }
+        });
+    </script>
 </body>
 </html> 

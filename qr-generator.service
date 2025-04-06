@@ -1,0 +1,23 @@
+[Unit]
+Description=Smart Inventory QR Generator Service
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/path/to/your/app
+ExecStart=/usr/bin/python3 /path/to/your/app/qr_generator_wsgi.py
+Restart=on-failure
+RestartSec=5s
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=qr-generator
+
+# Security measures
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectHome=yes
+
+[Install]
+WantedBy=multi-user.target 

@@ -7,35 +7,63 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Script to ensure no popups appear when returning to this page -->
+    <script>
+        window.onload = function() {
+            // Hide any modals that might be open
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.style.display = 'none';
+            });
+            
+            // Ensure body scroll is enabled
+            document.body.style.overflow = 'auto';
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    </script>
+    
     <script>
         // Hot Reload WebSocket Connection
         const connectWebSocket = () => {
-            const ws = new WebSocket('ws://localhost:8001');
-            
-            ws.onopen = () => {
-                console.log('WebSocket connected');
-            };
-            
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === 'reload') {
-                    console.log('Reloading page...');
-                    window.location.reload();
-                }
-            };
-            
-            ws.onclose = () => {
-                console.log('WebSocket disconnected. Reconnecting...');
-                setTimeout(connectWebSocket, 1000);
-            };
-            
-            ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            };
+            try {
+                // Use the FastAPI WebSocket endpoint
+                const ws = new WebSocket('ws://' + window.location.host + '/ws');
+                
+                ws.onopen = () => {
+                    console.log('WebSocket connected to FastAPI server');
+                };
+                
+                ws.onmessage = (event) => {
+                    try {
+                        const data = event.data;
+                        if (data === "reload") {
+                            console.log('Reloading page...');
+                            window.location.reload();
+                        }
+                    } catch (e) {
+                        console.error('Error processing WebSocket message:', e);
+                    }
+                };
+                
+                ws.onclose = () => {
+                    console.log('WebSocket disconnected. Reconnecting in 3 seconds...');
+                    setTimeout(connectWebSocket, 3000);
+                };
+                
+                ws.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                };
+            } catch (error) {
+                console.error('Failed to connect WebSocket:', error);
+                setTimeout(connectWebSocket, 5000);
+            }
         };
         
-        // Start WebSocket connection
-        connectWebSocket();
+        // Start WebSocket connection with a delay to allow page to load first
+        setTimeout(connectWebSocket, 2000);
     </script>
 </head>
 <body>
@@ -92,7 +120,7 @@
                         <p class="hero-subtitle">We will be happy to have you on board.</p>
                     </div>
                     <div class="signup-section">
-                        <button class="signup-btn">SIGN UP FOR FREE</button>
+                        <button class="signup-btn" onclick="window.location.href='signup.html'">SIGN UP FOR FREE</button>
                     </div>
                 </div>
             </div>
@@ -254,33 +282,11 @@
         </div>
     </div>
 
-    <div id="signupModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--primary-color);">Sign Up</h2>
-            <form class="modal-form" id="signupForm">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <button type="submit" class="submit-btn">Submit</button>
-            </form>
-        </div>
-    </div>
-
     <!-- Add the Coming Soon modal after the signup modal -->
     <div id="comingSoonModal" class="modal">
         <div class="modal-content coming-soon-content">
             <span class="close-modal">&times;</span>
-            <img src="png-clipart-coming-soon-sticker-coming-soon-cartoon-sign-icons-logos-emojis-coming-soon-thumbnail.png" alt="Coming Soon" class="coming-soon-img">
+            <img src="static/images/png-clipart-coming-soon-sticker-coming-soon-cartoon-sign-icons-logos-emojis-coming-soon-thumbnail.png" alt="Coming Soon" class="coming-soon-img">
         </div>
     </div>
 
@@ -374,74 +380,6 @@
                         }, 100);
                     }
                 });
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('signupModal');
-            const signupBtn = document.querySelector('.signup-btn');
-            const closeBtn = document.querySelector('.close-modal');
-            const form = document.getElementById('signupForm');
-
-            signupBtn.addEventListener('click', function() {
-                modal.style.display = 'block';
-                document.body.style.overflow = 'hidden';
-            });
-
-            closeBtn.addEventListener('click', function() {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            });
-
-            window.addEventListener('click', function(event) {
-                if (event.target === modal) {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }
-            });
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                // Handle form submission here
-                console.log('Form submitted:', {
-                    name: form.name.value,
-                    phone: form.phone.value,
-                    email: form.email.value
-                });
-                // You can add your form submission logic here
-                
-                // Close the modal after submission
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-                form.reset();
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const comingSoonModal = document.getElementById('comingSoonModal');
-            const comingSoonLinks = document.querySelectorAll('.coming-soon-link');
-            const closeButtons = document.querySelectorAll('.close-modal');
-
-            comingSoonLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    comingSoonModal.style.display = 'block';
-                    document.body.style.overflow = 'hidden';
-                });
-            });
-
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    comingSoonModal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                });
-            });
-
-            window.addEventListener('click', function(event) {
-                if (event.target === comingSoonModal) {
-                    comingSoonModal.style.display = 'none';
-                    document.body.style.overflow = 'auto';
-                }
             });
         });
 
@@ -547,6 +485,34 @@
                         }
                     }
                 });
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const comingSoonModal = document.getElementById('comingSoonModal');
+            const comingSoonLinks = document.querySelectorAll('.coming-soon-link');
+            const closeButtons = document.querySelectorAll('.close-modal');
+
+            comingSoonLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    comingSoonModal.style.display = 'block';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    comingSoonModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                });
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target === comingSoonModal) {
+                    comingSoonModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
             });
         });
     </script>

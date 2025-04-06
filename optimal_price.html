@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -42,13 +43,22 @@
 
     <div class="dashboard-container">
         <div class="container">
-            <div class="flex items-center justify-between mb-6">
-                <h1 class="dashboard-title">Products at Optimal Price</h1>
-                <a href="dashboard.html" class="back-btn">
-                    <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
-                </a>
+                
+            <h1 class="dashboard-title">Products at Optimal Price</h1>
+             <!-- Added search and sort functionality -->
+             <div class="search-sort-container">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="productSearch" placeholder="Search products..." class="search-input">
+                </div>
+                <div class="sort-container">
+                    <select id="productSort">
+                        <option value="default">Default Order</option>
+                        <option value="nameAsc">Name (A-Z)</option>
+                        <option value="nameDesc">Name (Z-A)</option>
+                    </select>
+                </div>
             </div>
-            
             <div class="info-banner bg-green-100 border-l-4 border-green-500 p-4 mb-6">
                 <div class="flex">
                     <div class="flex-shrink-0">
@@ -63,7 +73,7 @@
             </div>
             
             <div class="table-container">
-                <table class="data-table">
+                <table class="data-table" id="productsTable">
                     <thead>
                         <tr>
                             <th>Product Name</th>
@@ -144,5 +154,59 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Search functionality
+            const searchInput = document.getElementById('productSearch');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const tableRows = document.querySelectorAll('#productsTable tbody tr');
+                
+                tableRows.forEach(row => {
+                    const productName = row.querySelector('td:first-child').textContent.toLowerCase();
+                    if (productName.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Sorting functionality
+            const sortSelect = document.getElementById('productSort');
+            sortSelect.addEventListener('change', function() {
+                const sortValue = this.value;
+                const tableBody = document.querySelector('#productsTable tbody');
+                const rows = Array.from(tableBody.querySelectorAll('tr'));
+                
+                if (sortValue === 'nameAsc') {
+                    rows.sort((a, b) => {
+                        const aName = a.querySelector('td:first-child').textContent;
+                        const bName = b.querySelector('td:first-child').textContent;
+                        return aName.localeCompare(bName);
+                    });
+                } else if (sortValue === 'nameDesc') {
+                    rows.sort((a, b) => {
+                        const aName = a.querySelector('td:first-child').textContent;
+                        const bName = b.querySelector('td:first-child').textContent;
+                        return bName.localeCompare(aName);
+                    });
+                } else {
+                    // Default sorting (by original order)
+                    rows.sort((a, b) => {
+                        return Array.from(tableBody.querySelectorAll('tr')).indexOf(a) - 
+                               Array.from(tableBody.querySelectorAll('tr')).indexOf(b);
+                    });
+                }
+                
+                // Clear and re-append sorted rows
+                while (tableBody.firstChild) {
+                    tableBody.removeChild(tableBody.firstChild);
+                }
+                
+                rows.forEach(row => tableBody.appendChild(row));
+            });
+        });
+    </script>   
 </body>
 </html> 

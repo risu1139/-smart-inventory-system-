@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- Add QR Code library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <style>
         /* ... other styles ... */
         
@@ -63,6 +65,100 @@
 
         .modal-body::-webkit-scrollbar-thumb:hover {
             background: #555;
+        }
+
+        /* QR Code styles */
+        .qr-container {
+            text-align: center;
+            margin: 20px 0;
+            min-height: 200px;
+        }
+
+        .qr-options {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .print-copies {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .print-copies input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        .regenerate-qr-btn, .print-qr-btn, .confirm-print-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .regenerate-qr-btn:hover, .print-qr-btn:hover, .confirm-print-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        #editQrCanvas {
+            margin: 0 auto;
+            display: block;
+            width: 200px;
+            height: 200px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .cancel-btn, .save-btn {
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .cancel-btn {
+            background-color: #f1f1f1;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .save-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        
+        /* Style for the new analysis button */
+        .analysis-btn {
+            background: none;
+            border: none;
+            color: #4a6cf7;
+            cursor: pointer;
+            margin-left: 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        
+        .analysis-btn:hover {
+            background-color: rgba(74, 108, 247, 0.1);
         }
     </style>
 </head>
@@ -209,6 +305,27 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label>QR Code</label>
+                        <div class="qr-container">
+                            <canvas id="editQrCanvas"></canvas>
+                        </div>
+                        <div class="qr-options">
+                            <button type="button" class="regenerate-qr-btn">
+                                <i class="fas fa-sync-alt"></i> Regenerate
+                            </button>
+                            <button type="button" class="print-qr-btn">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                        </div>
+                        <div class="print-copies" style="display: none;">
+                            <label for="editCopyCount">Number of copies:</label>
+                            <input type="number" id="editCopyCount" min="1" value="1">
+                            <button type="button" class="confirm-print-btn">
+                                <i class="fas fa-check"></i> Confirm Print
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="vendors">Vendors</label>
                         <div class="vendor-list" id="vendorList">
                             <!-- Vendor entries will be added here dynamically -->
@@ -221,7 +338,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                <button type="button" class="cancel-btn close-modal">Cancel</button>
                 <button type="submit" form="productForm" class="save-btn">Save</button>
             </div>
         </div>
