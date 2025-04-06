@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Feedback - Smart Inventory Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #4f46e5;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tagline {
+            color: #6b7280;
+            font-size: 1rem;
+        }
+        
+        .feedback-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .purchase-summary {
+            background-color: #f3f4f6;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .purchase-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .purchase-items {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        
+        .purchase-items th {
+            text-align: left;
+            padding: 0.75rem 0.5rem;
+            font-weight: 600;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .purchase-items td {
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .purchase-items tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .feedback-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .feedback-section h3 {
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .feedback-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #f9fafb;
+            margin-bottom: 1rem;
+        }
+        
+        .feedback-item-title {
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .star-rating {
+            display: inline-flex;
+            gap: 0.25rem;
+            direction: rtl; /* This ensures the stars fill from right to left */
+        }
+        
+        .star-rating input {
+            display: none;
+        }
+        
+        .star-rating label {
+            cursor: pointer;
+            color: #d1d5db;
+            font-size: 1.5rem;
+            transition: color 0.2s ease;
+        }
+        
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #fbbf24;
+        }
+        
+        .feedback-comment {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+        
+        .feedback-comment:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+        
+        .submit-btn {
+            background-color: #4f46e5;
+            color: white;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: center;
+            margin-top: 1rem;
+        }
+        
+        .submit-btn:hover {
+            background-color: #4338ca;
+            transform: translateY(-2px);
+        }
+        
+        .thank-you-card {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .thank-you-icon {
+            font-size: 4rem;
+            color: #22c55e;
+            margin-bottom: 1.5rem;
+        }
+        
+        .thank-you-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .thank-you-message {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        #debugPanel {
+            display: none !important;
+        }
+        
+        .debug-alert {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Smart Inventory</div>
+            <div class="tagline">We value your feedback</div>
+            <div id="feedbackIdDisplay" style="margin-top: 10px; font-size: 0.9rem; color: #666; background: #f3f4f6; display: inline-block; padding: 4px 10px; border-radius: 4px;"></div>
+        </div>
+        
+        <div id="feedbackCard" class="feedback-card">
+            <h2 class="card-title">Please Rate Your Recent Purchase</h2>
+            
+            <div class="purchase-summary">
+                <div class="purchase-title">Your Purchase Summary:</div>
+                <table class="purchase-items">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchaseTableBody">
+                        <!-- Items will be loaded dynamically -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3"><strong>Total</strong></td>
+                            <td id="purchaseTotal"><strong>₹0.00</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <form id="remoteForm" class="feedback-form">
+                <div class="feedback-section">
+                    <h3>Overall Shop Rating</h3>
+                    <div class="feedback-item">
+                        <div class="feedback-item-title">
+                            <span>How was your overall experience with our shop?</span>
+                            <div class="star-rating" id="shopRating">
+                                <input type="radio" id="shop-star5" name="shop-rating" value="5" required>
+                                <label for="shop-star5"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="shop-star4" name="shop-rating" value="4">
+                                <label for="shop-star4"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="shop-star3" name="shop-rating" value="3">
+                                <label for="shop-star3"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="shop-star2" name="shop-rating" value="2">
+                                <label for="shop-star2"><i class="fas fa-star"></i></label>
+                                <input type="radio" id="shop-star1" name="shop-rating" value="1">
+                                <label for="shop-star1"><i class="fas fa-star"></i></label>
+                            </div>
+                        </div>
+                        <textarea class="feedback-comment" placeholder="Share your thoughts about our shop..." name="shop-comment"></textarea>
+                    </div>
+                </div>
+                
+                <div class="feedback-section">
+                    <h3>Product Ratings</h3>
+                    <!-- Product ratings will be loaded dynamically -->
+                </div>
+                
+                <button type="submit" class="submit-btn">Submit Feedback</button>
+            </form>
+        </div>
+        
+        <div id="thankYouCard" class="feedback-card thank-you-card">
+            <div class="thank-you-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 class="thank-you-title">Thank You for Your Feedback!</h3>
+            <p class="thank-you-message">Your feedback helps us improve our products and services. We appreciate your time and look forward to serving you again.</p>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; <span id="currentYear"></span> Smart Inventory Management System. All rights reserved.</p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year in footer copyright
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Get the feedback ID from URL if present
+            const urlParams = new URLSearchParams(window.location.search);
+            const feedbackId = urlParams.get('sale_id') || urlParams.get('id');
+            
+            // Function to log messages to the debug panel (empty stub for compatibility)
+            function logDebug(message) {
+                // Empty function to prevent errors when logDebug is called
+            }
+            
+            // Display feedback ID for testing purposes
+            const feedbackIdDisplay = document.getElementById('feedbackIdDisplay');
+            if (feedbackId) {
+                feedbackIdDisplay.textContent = `Feedback ID: ${feedbackId}`;
+                
+                // Load the sale data
+                loadSaleData(feedbackId);
+            } else {
+                feedbackIdDisplay.textContent = `No Feedback ID detected`;
+            }
+            
+            // Function to load sale data
+            function loadSaleData(saleId) {
+                if (!saleId) {
+                    return;
+                }
+                
+                // Always use the direct SQL query endpoint which we know works
+                fetch(`/?raw_sale_id=${saleId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to fetch sale data: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!data) {
+                            throw new Error("No data returned from API");
+                        }
+                        
+                        displaySaleData(data);
+                    })
+                    .catch(error => {
+                        // Show error message to user
+                        const purchaseTable = document.getElementById('purchaseTableBody');
+                        if (purchaseTable) {
+                            purchaseTable.innerHTML = '<tr><td colspan="4">Unable to load purchase data. Please check your link or contact support.</td></tr>';
+                        }
+                        
+                        const productRatingsSection = document.querySelector('.feedback-section:nth-child(2)');
+                        if (productRatingsSection) {
+                            productRatingsSection.innerHTML = '<h3>Product Ratings</h3><div class="feedback-item"><p>No products available to rate.</p></div>';
+                        }
+                    });
+            }
+            
+            // Function to display sale data in the UI
+            function displaySaleData(data) {
+                try {
+                    // Calculate total amount if not provided
+                    let totalAmount = data.total_amount || 0;
+                    if (!totalAmount && data.items) {
+                        totalAmount = data.items.reduce((sum, item) => sum + (parseFloat(item.price) * parseInt(item.quantity)), 0);
+                    }
+
+                    // Format total
+                    const formattedTotal = new Intl.NumberFormat('en-IN', { 
+                        style: 'currency', 
+                        currency: 'INR',
+                        maximumFractionDigits: 0
+                    }).format(totalAmount);
+                    
+                    // Get the purchase table element
+                    const purchaseTable = document.getElementById('purchaseTableBody');
+                    if (!purchaseTable) {
+                        return;
+                    }
+                    
+                    // Clear existing items
+                    purchaseTable.innerHTML = '';
+                    
+                    // Add sale items
+                    if (data.items && data.items.length > 0) {
+                        data.items.forEach((item, index) => {
+                            try {
+                                // Format price as currency
+                                const priceValue = parseFloat(item.price);
+                                const price = new Intl.NumberFormat('en-IN', { 
+                                    style: 'currency', 
+                                    currency: 'INR',
+                                    maximumFractionDigits: 0
+                                }).format(priceValue);
+                                
+                                // Calculate and format item total
+                                const qty = parseInt(item.quantity);
+                                const itemTotal = priceValue * qty;
+                                const total = new Intl.NumberFormat('en-IN', { 
+                                    style: 'currency', 
+                                    currency: 'INR',
+                                    maximumFractionDigits: 0
+                                }).format(itemTotal);
+                                
+                                // Create table row
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${item.product_name || 'Unknown Product'}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${price}</td>
+                                    <td>${total}</td>
+                                `;
+                                
+                                // Add row to table
+                                purchaseTable.appendChild(row);
+                            } catch(e) {
+                                // Silently handle errors
+                            }
+                        });
+                    } else {
+                        purchaseTable.innerHTML = '<tr><td colspan="4">No items found in this purchase</td></tr>';
+                    }
+                    
+                    // Update the footer total
+                    const totalElement = document.getElementById('purchaseTotal');
+                    if (totalElement) {
+                        totalElement.innerHTML = `<strong>${formattedTotal}</strong>`;
+                    }
+                    
+                    // Clear existing product ratings
+                    const productRatingsSection = document.querySelector('.feedback-section:nth-child(2)');
+                    if (!productRatingsSection) {
+                        return;
+                    }
+                    
+                    productRatingsSection.innerHTML = '<h3>Product Ratings</h3>';
+                    
+                    // Add product rating items
+                    if (data.items && data.items.length > 0) {
+                        data.items.forEach((item, index) => {
+                            try {
+                                const ratingItem = document.createElement('div');
+                                ratingItem.className = 'feedback-item';
+                                ratingItem.setAttribute('data-sale-item-id', item.id);
+                                
+                                ratingItem.innerHTML = `
+                                    <div class="feedback-item-title">
+                                        <span>${item.product_name || 'Unknown Product'} (Qty: ${item.quantity})</span>
+                                        <div class="star-rating">
+                                            <input type="radio" id="product-${item.id}-star5" name="product-${item.id}-rating" value="5" required>
+                                            <label for="product-${item.id}-star5"><i class="fas fa-star"></i></label>
+                                            <input type="radio" id="product-${item.id}-star4" name="product-${item.id}-rating" value="4">
+                                            <label for="product-${item.id}-star4"><i class="fas fa-star"></i></label>
+                                            <input type="radio" id="product-${item.id}-star3" name="product-${item.id}-rating" value="3">
+                                            <label for="product-${item.id}-star3"><i class="fas fa-star"></i></label>
+                                            <input type="radio" id="product-${item.id}-star2" name="product-${item.id}-rating" value="2">
+                                            <label for="product-${item.id}-star2"><i class="fas fa-star"></i></label>
+                                            <input type="radio" id="product-${item.id}-star1" name="product-${item.id}-rating" value="1">
+                                            <label for="product-${item.id}-star1"><i class="fas fa-star"></i></label>
+                                        </div>
+                                    </div>
+                                    <textarea class="feedback-comment" placeholder="Share your thoughts about this product..." name="product-${item.id}-comment"></textarea>
+                                `;
+                                
+                                productRatingsSection.appendChild(ratingItem);
+                            } catch(e) {
+                                // Silently handle errors
+                            }
+                        });
+                } else {
+                        const noItemsMessage = document.createElement('div');
+                        noItemsMessage.className = 'feedback-item';
+                        noItemsMessage.innerHTML = '<p>No items found to rate</p>';
+                        productRatingsSection.appendChild(noItemsMessage);
+                    }
+                } catch (error) {
+                    // Silently handle errors
+                }
+            }
+            
+            // Handle form submission
+            const remoteForm = document.getElementById('remoteForm');
+            remoteForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Collect feedback data
+                const formData = new FormData(remoteForm);
+                const feedbackData = {
+                    sale_id: parseInt(feedbackId, 10),
+                    overall_rating: parseInt(formData.get('shop-rating'), 10),
+                    overall_comment: formData.get('shop-comment'),
+                    item_feedback: []
+                };
+                
+                // Collect product feedback
+                document.querySelectorAll('[data-sale-item-id]').forEach(item => {
+                    const saleItemId = item.getAttribute('data-sale-item-id');
+                    const ratingName = `product-${saleItemId}-rating`;
+                    const commentName = `product-${saleItemId}-comment`;
+                    
+                    if (formData.get(ratingName)) {
+                        feedbackData.item_feedback.push({
+                            sale_item_id: parseInt(saleItemId, 10),
+                            rating: parseInt(formData.get(ratingName), 10),
+                            comment: formData.get(commentName)
+                        });
+                    }
+                });
+                
+                console.log('Submitting feedback:', feedbackData);
+                logDebug(`Submitting feedback with ratings: Shop=${feedbackData.overall_rating}, Items: ${feedbackData.item_feedback.length}`);
+                
+                // Send data to the API
+                fetch('/api/submit-feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(feedbackData),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    logDebug(`Feedback successfully saved to database! ID: ${data.feedback_id}`);
+                    // Show thank you message
+                    document.getElementById('feedbackCard').style.display = 'none';
+                    document.getElementById('thankYouCard').style.display = 'block';
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    logDebug(`Error submitting feedback: ${error.message}`);
+                    alert('There was an error submitting your feedback. Please try again.');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
