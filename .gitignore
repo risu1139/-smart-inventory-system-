@@ -1,54 +1,7 @@
-# Virtual environments
-venv/
-env/
-ENV/
-.env/
-.venv/
-env.bak/
-venv.bak/
-
-# Python cache files
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.coverage
-htmlcov/
-*.so
-
-# Media files
+# Large files
+Ollama.app/
 *.mp4
-*.mov
-*.avi
-*.wmv
-*.flv
-*.pdf
-*.odp
-*.pptx
-*.docx
-*.ppt
-*.doc
-
-# Large data files
-*.db-journal
-*.db-shm
-*.db-wal
-
-# Logs
-logs/
-*.log
-
-# Distribution / packaging
-dist/
-build/
-*.egg-info/
-
-# Backup files
-*.bak
-*~
-.*.swp
-*.old
-*.orig
+*.app/
 
 # OS generated files
 .DS_Store
@@ -59,22 +12,51 @@ build/
 ehthumbs.db
 Thumbs.db
 
-# IDEs and editors
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+
+# Database
+*.db
+*.sqlite3
+
+# IDE files
 .idea/
 .vscode/
-*.sublime-project
-*.sublime-workspace
-.project
-.pydevproject
-.settings/
+*.swp
+*.swo
 
-# Jupyter Notebook
-.ipynb_checkpoints
+# Python virtual environment
+venv/
+__pycache__/
+*.pyc
 
-# Specific to this project
-WhatsApp Video 2025-01-27 at 01.08.44.mp4
-plaksha_lecture.pdf
-WebDev_AI.odp
-presentation3.pptx
-presentation_and_report3.zip
-inventory.db
+# IDE files
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db 

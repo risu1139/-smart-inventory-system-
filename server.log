@@ -1,0 +1,14 @@
+INFO:     Started server process [99414]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:9000 (Press CTRL+C to quit)
+Initializing database...
+Initializing database at /Users/rishav/Documents/University_courses/Sem_6/webai/inventory.db
+Base tables created successfully
+Schema updates completed successfully
+Database initialization completed
+Database initialization complete.
+Starting Smart Inventory API server...
+API will be available at: http://localhost:9000/api/
+INFO:     127.0.0.1:54236 - "GET /api/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54272 - "GET /products HTTP/1.1" 404 Not Found
